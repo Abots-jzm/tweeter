@@ -2,22 +2,23 @@ import { ChangeEvent, FormEvent, useState } from "react";
 import { FaGoogle } from "react-icons/fa";
 import { IoMdLock } from "react-icons/io";
 import { MdEmail } from "react-icons/md";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import styled, { keyframes } from "styled-components";
 import { Paths } from "../../routes";
-// import useGoogleLogin from "../../hooks/auth/useGoogleLogin";
-// import useGuestLogin from "../../hooks/auth/useGuestLogin";
+import LogoSVG from "../../assets/tweeter.svg";
+import useGuestLogin from "../../hooks/auth/useGuestLogin";
+import useGoogleLogin from "../../hooks/auth/useGoogleLogin";
 
 type Props = {
-	enteredEmail?: string;
-	enteredPassword?: string;
-	errorMessage?: string;
-	errorMessageIsShown?: boolean;
-	isLoading?: boolean;
+	enteredEmail: string;
+	enteredPassword: string;
+	errorMessage: string;
+	errorMessageIsShown: boolean;
+	isLoading: boolean;
 	nextPath?: string;
-	handleSubmit?: (e: FormEvent<HTMLFormElement>) => void;
-	onEmailChange?: (e: ChangeEvent<HTMLInputElement>) => void;
-	onPasswordChange?: (e: ChangeEvent<HTMLInputElement>) => void;
+	handleSubmit: (e: FormEvent<HTMLFormElement>) => void;
+	onEmailChange: (e: ChangeEvent<HTMLInputElement>) => void;
+	onPasswordChange: (e: ChangeEvent<HTMLInputElement>) => void;
 };
 
 function Layout({
@@ -32,42 +33,43 @@ function Layout({
 	onPasswordChange,
 }: Props) {
 	const location = useLocation();
+	const navigate = useNavigate();
 	const isLoginPage = location.pathname === Paths.auth.login;
 
-	// const { mutate: googleLogin, isLoading: googleIsLoading, isError: googleIsError } = useGoogleLogin();
+	const { mutate: googleLogin, isLoading: googleIsLoading, isError: googleIsError } = useGoogleLogin();
 	const [googleErrorMessage, setGoogleErrorMessage] = useState("");
 
-	// const { mutate: guestLogin, isLoading: guestIsLoading, isError: guestIsError } = useGuestLogin();
+	const { mutate: guestLogin, isLoading: guestIsLoading, isError: guestIsError } = useGuestLogin();
 	const [guestErrorMessage, setGuestErrorMessage] = useState("");
 
-	const [logInComplete, setLogInComplete] = useState(false);
-	// useGetUserProfile(logInComplete, nextPath);
+	async function onGoogleSubmit() {
+		googleLogin(undefined, {
+			onSuccess() {
+				navigate(nextPath || Paths.home, { replace: true });
+			},
+			onError() {
+				setGoogleErrorMessage("An unexpected error occured");
+			},
+		});
+	}
 
-	// async function onGoogleSubmit() {
-	// 	googleLogin(undefined, {
-	// 		onSuccess() {
-	// 			setLogInComplete(true);
-	// 		},
-	// 		onError() {
-	// 			setGoogleErrorMessage("An unexpected error occured");
-	// 		},
-	// 	});
-	// }
-
-	// async function onGuestSubmit() {
-	// 	guestLogin(undefined, {
-	// 		onSuccess() {
-	// 			setLogInComplete(true);
-	// 		},
-	// 		onError() {
-	// 			setGuestErrorMessage("An unexpected error occured");
-	// 		},
-	// 	});
-	// }
+	async function onGuestSubmit() {
+		guestLogin(undefined, {
+			onSuccess() {
+				navigate(nextPath || Paths.home, { replace: true });
+			},
+			onError() {
+				setGuestErrorMessage("An unexpected error occured");
+			},
+		});
+	}
 
 	return (
 		<Container>
 			<div>
+				<LogoContainer>
+					<img src={LogoSVG} alt="tweeter logo" />
+				</LogoContainer>
 				<SignupText>{isLoginPage ? "Login" : "Sign up"}</SignupText>
 				<Form onSubmit={handleSubmit}>
 					<div>
@@ -106,21 +108,19 @@ function Layout({
 				{errorMessageIsShown && <ErrorMessage>{errorMessage}</ErrorMessage>}
 				<Others>
 					<div>or</div>
-					{/* <OtherBtn onClick={onGoogleSubmit}> */}
-					<OtherBtn>
+					<OtherBtn onClick={onGoogleSubmit}>
 						<div className="icon">
 							<FaGoogle />
 						</div>
 						<span>continue with Google</span>
-						{/* {googleIsLoading && <SpinnerGray />} */}
+						{googleIsLoading && <SpinnerGray />}
 					</OtherBtn>
-					{/* {googleIsError && <ErrorMessage>{googleErrorMessage}</ErrorMessage>} */}
-					{/* <OtherBtn onClick={onGuestSubmit}> */}
-					<OtherBtn>
+					{googleIsError && <ErrorMessage>{googleErrorMessage}</ErrorMessage>}
+					<OtherBtn onClick={onGuestSubmit}>
 						<span>continue as a guest</span>
-						{/* {guestIsLoading && <SpinnerGray />} */}
+						{guestIsLoading && <SpinnerGray />}
 					</OtherBtn>
-					{/* {guestIsError && <ErrorMessage>{guestErrorMessage}</ErrorMessage>} */}
+					{guestIsError && <ErrorMessage>{guestErrorMessage}</ErrorMessage>}
 					<div className="other-text">
 						{isLoginPage && (
 							<>
@@ -140,6 +140,18 @@ function Layout({
 }
 
 export default Layout;
+
+const LogoContainer = styled.div`
+	height: 3rem;
+	margin-bottom: 4rem;
+
+	img {
+		height: 100%;
+		width: 100%;
+		object-fit: contain;
+		object-position: left;
+	}
+`;
 
 const spinner = keyframes`
    100% {
@@ -268,6 +280,7 @@ const Container = styled.div`
 	@media only screen and (max-width: 473px) {
 		place-items: start;
 		padding-top: 5vh;
+		background-color: inherit;
 
 		& > div {
 			box-shadow: none;
