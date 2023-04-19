@@ -5,6 +5,7 @@ import { Paths } from "../../routes";
 import { auth } from "../../api/firebase";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import { authActions } from "../../store/slices/authSlice";
+import Layout from "../Layout";
 
 function RequireAuth() {
 	const user = useAppSelector((state) => state.auth.uid);
@@ -20,7 +21,11 @@ function RequireAuth() {
 
 	return (
 		<>
-			{user && <Outlet />}
+			{user && (
+				<Layout>
+					<Outlet />
+				</Layout>
+			)}
 			{!user && <Navigate to={Paths.auth.login} state={{ from: location }} replace />}
 		</>
 	);

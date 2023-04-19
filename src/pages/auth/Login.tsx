@@ -1,7 +1,7 @@
 import React, { FormEvent, useState } from "react";
 import Layout from "../../components/auth/Layout";
 import useLogin from "../../hooks/auth/useLogin";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { Paths } from "../../routes";
 
 function Login() {
@@ -15,7 +15,7 @@ function Login() {
 	const prevPath = location.state?.from?.pathname;
 	const nextPath = prevPath && prevPath !== Paths.auth.login && prevPath !== Paths.auth.signup ? prevPath : Paths.home;
 
-	const [logInComplete, setLogInComplete] = useState(false);
+	const navigate = useNavigate();
 
 	function handleSubmit(e: FormEvent<HTMLFormElement>) {
 		e.preventDefault();
@@ -26,7 +26,7 @@ function Login() {
 			},
 			{
 				onSuccess() {
-					setLogInComplete(true);
+					navigate(Paths.home, { replace: true });
 				},
 				onError(err: any) {
 					console.log(err.message);
