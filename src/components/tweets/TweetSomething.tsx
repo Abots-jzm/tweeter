@@ -230,7 +230,6 @@ const Heading = styled.div`
 `;
 
 const Container = styled.div`
-	margin-top: 2.5rem;
 	width: 100%;
 	padding: 1rem 2rem;
 	background-color: #ffffff;

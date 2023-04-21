@@ -49,7 +49,7 @@ const Likes = styled.div`
 	font-weight: 500;
 	color: #bdbdbd;
 
-	& :first-child {
+	& > :first-child {
 		display: flex;
 		align-items: center;
 		gap: 0.5rem;
