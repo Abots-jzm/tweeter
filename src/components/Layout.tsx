@@ -42,11 +42,14 @@ function Layout({ children }: Props) {
 						Home
 						{location.pathname === Paths.home ? <ActiveBar layoutId="active" /> : <Bar />}
 					</Tab>
-					<Tab onClick={() => navigate(Paths.explore)} isActive={location.pathname === Paths.explore}>
+					<Tab onClick={() => navigate(Paths.explore + "?filter=top")} isActive={location.pathname === Paths.explore}>
 						Explore
 						{location.pathname === Paths.explore ? <ActiveBar layoutId="active" /> : <Bar />}
 					</Tab>
-					<Tab onClick={() => navigate(Paths.bookmarks)} isActive={location.pathname === Paths.bookmarks}>
+					<Tab
+						onClick={() => navigate(Paths.bookmarks + "?filter=tweet")}
+						isActive={location.pathname === Paths.bookmarks}
+					>
 						Bookmarks
 						{location.pathname === Paths.bookmarks ? <ActiveBar layoutId="active" /> : <Bar />}
 					</Tab>
@@ -83,11 +86,14 @@ function Layout({ children }: Props) {
 						<MdHome />
 						{location.pathname === Paths.home ? <ActiveBar layoutId="mActive" /> : <Bar />}
 					</Tab>
-					<Tab onClick={() => navigate(Paths.explore)} isActive={location.pathname === Paths.explore}>
+					<Tab onClick={() => navigate(Paths.explore + "?filter=top")} isActive={location.pathname === Paths.explore}>
 						<MdExplore />
 						{location.pathname === Paths.explore ? <ActiveBar layoutId="mActive" /> : <Bar />}
 					</Tab>
-					<Tab onClick={() => navigate(Paths.bookmarks)} isActive={location.pathname === Paths.bookmarks}>
+					<Tab
+						onClick={() => navigate(Paths.bookmarks + "?filter=tweet")}
+						isActive={location.pathname === Paths.bookmarks}
+					>
 						<MdBookmark />
 						{location.pathname === Paths.bookmarks ? <ActiveBar layoutId="mActive" /> : <Bar />}
 					</Tab>

@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import styled from "styled-components";
 import TweetSomething from "../components/tweets/TweetSomething";
 import Tweet from "../components/tweets/Tweet";
-import Recommendation from "../components/tweets/Recommendation";
+import Person from "../components/tweets/Person";
 
 function Home() {
 	const [replyModalOpen, setReplyModalOpen] = useState(false);
@@ -24,11 +24,11 @@ function Home() {
 			</div>
 			<div className="right">
 				<Heading>Who to follow</Heading>
-				<RecContainer>
-					<Recommendation />
-					<Recommendation />
-					<Recommendation />
-				</RecContainer>
+				<People>
+					<Person truncate />
+					<Person truncate />
+					<Person truncate />
+				</People>
 			</div>
 		</Container>
 	);
@@ -43,7 +43,7 @@ const TweetsContainer = styled.div`
 	gap: 2.4rem;
 `;
 
-const RecContainer = styled.div`
+const People = styled.div`
 	display: flex;
 	flex-direction: column;
 `;

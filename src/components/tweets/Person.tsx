@@ -3,7 +3,11 @@ import styled from "styled-components";
 import BlankPNG from "../../assets/blank-profile-picture.png";
 import { MdPersonAdd } from "react-icons/md";
 
-function Recommendation() {
+type Props = {
+	truncate?: boolean;
+};
+
+function Person({ truncate }: Props) {
 	const [isFollowing, setIsFollowing] = useState(false);
 
 	function truncateTxt(value: string, length: number) {
@@ -17,7 +21,9 @@ function Recommendation() {
 					<img src={BlankPNG} alt={"name" + ""} />
 				</Picture>
 				<div>
-					<div className="name">{truncateTxt("Micheal Stanley", isFollowing ? 8 : 10)}</div>
+					<div className="name">
+						{truncate ? truncateTxt("Micheal Stanley", isFollowing ? 8 : 10) : "Micheal Stanley"}
+					</div>
 					<div className="followers">230k followers</div>
 				</div>
 				<button onClick={() => setIsFollowing((prev) => !prev)}>
@@ -36,7 +42,7 @@ function Recommendation() {
 	);
 }
 
-export default Recommendation;
+export default Person;
 
 const Cover = styled.div`
 	margin-top: 2.1rem;
