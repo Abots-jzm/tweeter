@@ -5,7 +5,7 @@ import LogoSVG from "../assets/tweeter.svg";
 import BlankPNG from "../assets/blank-profile-picture.png";
 import { AiOutlineCaretDown } from "react-icons/ai";
 import { HiUserCircle } from "react-icons/hi";
-import { MdHome, MdExplore, MdBookmarks } from "react-icons/md";
+import { MdHome, MdExplore, MdBookmark } from "react-icons/md";
 import { TbLogout } from "react-icons/tb";
 import { useNavigate } from "react-router-dom";
 import { Paths } from "../routes";
@@ -88,7 +88,7 @@ function Layout({ children }: Props) {
 						{location.pathname === Paths.explore ? <ActiveBar layoutId="mActive" /> : <Bar />}
 					</Tab>
 					<Tab onClick={() => navigate(Paths.bookmarks)} isActive={location.pathname === Paths.bookmarks}>
-						<MdBookmarks />
+						<MdBookmark />
 						{location.pathname === Paths.bookmarks ? <ActiveBar layoutId="mActive" /> : <Bar />}
 					</Tab>
 				</MobileTabs>
@@ -260,6 +260,7 @@ const Profile = styled.div`
 const Outlet = styled.div`
 	flex: 1;
 	background-color: #f2f2f2;
+	overflow-y: auto;
 `;
 
 const Header = styled.header`
