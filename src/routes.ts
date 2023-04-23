@@ -7,5 +7,5 @@ export const Paths = {
 	explore: "/explore",
 	bookmarks: "/bookmarks",
 	profile: "/profile",
-	profileSetup: "/profile-setup",
+	profileEdit: "/profile-edit",
 };

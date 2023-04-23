@@ -3,7 +3,6 @@ import { motion } from "framer-motion";
 import styled from "styled-components";
 import Tweet from "../components/tweets/Tweet";
 import { useSearchParams } from "react-router-dom";
-import Person from "../components/tweets/Person";
 
 type Tab = "tweet" | "replies" | "media" | "likes";
 
@@ -47,13 +46,6 @@ function Bookmarks() {
 }
 
 export default Bookmarks;
-
-const People = styled.div`
-	padding: 2rem;
-	background-color: #ffffff;
-	box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.05);
-	border-radius: 12px;
-`;
 
 const TweetsContainer = styled.div`
 	display: flex;

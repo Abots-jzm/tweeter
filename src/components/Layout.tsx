@@ -28,7 +28,7 @@ function Layout({ children }: Props) {
 
 	function onProfileClicked() {
 		setLogoutModalOpen(false);
-		navigate(Paths.profile);
+		navigate(Paths.profile + "?filter=tweet");
 	}
 
 	return (
@@ -189,6 +189,7 @@ const LogoutModal = styled.div<ILogoutModal>`
 	font-weight: 500;
 	flex-direction: column;
 	gap: 2.4rem;
+	z-index: 5;
 
 	& > div {
 		padding: 1.1rem;
