@@ -11,6 +11,7 @@ import { useNavigate } from "react-router-dom";
 import { Paths } from "../routes";
 import useLogout from "../hooks/auth/useLogout";
 import { motion } from "framer-motion";
+import { useAppSelector } from "../store/hooks";
 
 type Props = {
 	children: React.ReactNode;
@@ -20,6 +21,7 @@ function Layout({ children }: Props) {
 	const { mutate: logout } = useLogout();
 	const [logoutModalOpen, setLogoutModalOpen] = useState(false);
 	const navigate = useNavigate();
+	const userId = useAppSelector((state) => state.auth.uid);
 
 	function toggleLogoutModal(e: React.MouseEvent<HTMLDivElement>) {
 		e.stopPropagation();
@@ -28,7 +30,8 @@ function Layout({ children }: Props) {
 
 	function onProfileClicked() {
 		setLogoutModalOpen(false);
-		navigate(Paths.profile + "?filter=tweet");
+		// navigate(Paths.profile + "?filter=tweet");
+		navigate(`${Paths.profile}/${userId}?filter=tweet`);
 	}
 
 	return (

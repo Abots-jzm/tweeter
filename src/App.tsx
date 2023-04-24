@@ -8,6 +8,7 @@ import RequireAuth from "./components/auth/RequireAuth";
 import Explore from "./pages/Explore";
 import Profile from "./pages/Profile";
 import Bookmarks from "./pages/Bookmarks";
+import ProfileEdit from "./pages/ProfileEdit";
 
 function App() {
 	return (
@@ -19,7 +20,8 @@ function App() {
 				<Route path={Paths.home} element={<Home />} />
 				<Route path={Paths.explore} element={<Explore />} />
 				<Route path={Paths.bookmarks} element={<Bookmarks />} />
-				<Route path={Paths.profile} element={<Profile />} />
+				<Route path={Paths.profile + "/:id"} element={<Profile />} />
+				<Route path={Paths.profileEdit} element={<ProfileEdit />} />
 			</Route>
 		</Routes>
 	);

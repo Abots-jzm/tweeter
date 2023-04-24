@@ -1,17 +1,24 @@
 import React, { useState } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import styled from "styled-components";
 import Tweet from "../components/tweets/Tweet";
 import { motion } from "framer-motion";
 import BlankPNG from "../assets/blank-profile-picture.png";
 import { MdPersonAdd } from "react-icons/md";
+import { Paths } from "../routes";
+import { useAppSelector } from "../store/hooks";
 
 type Tab = "tweet" | "replies" | "media" | "likes";
 
 function Profile() {
 	const [isFollowing, setIsFollowing] = useState(false);
 	const [searchParams, setSearchParams] = useSearchParams({ filter: "tweet" });
+	const { id } = useParams();
+	const userId = useAppSelector((state) => state.auth.uid);
 	const activeTab = searchParams.get("filter") as Tab;
+	const navigate = useNavigate();
+
+	const isMyProfile = id === userId;
 
 	return (
 		<Container>
@@ -19,30 +26,41 @@ function Profile() {
 				<img src="https://4kwallpapers.com/images/walls/thumbs_2t/10362.jpg" alt="cover" />
 			</CoverImg>
 			<ProfileInfo>
-				<Picture>
-					<div>
-						<img src={BlankPNG} alt="picture" />
-					</div>
-				</Picture>
-				<Info>
-					<div className="top">
-						<div className="name bold">Daniel Jensen</div>
+				<div>
+					<Picture>
 						<div>
-							<span className="bold">2,569</span> Following
+							<img src={BlankPNG} alt="picture" />
 						</div>
-						<div>
-							<span className="bold">10.8k</span> Followers
+					</Picture>
+					<Info>
+						<div className="top">
+							<div className="name bold">Daniel Jensen</div>
+							<div className="count">
+								<div>
+									<span className="bold">2,569</span> Following
+								</div>
+								<div>
+									<span className="bold">10.8k</span> Followers
+								</div>
+							</div>
 						</div>
-					</div>
-					<div className="bio">
-						Lorem ipsum dolor, sit amet consectetur adipisicing elit. Enim, aliquam laudantium aut quo porro autem
-						voluptas eaque blanditiis natus ab
-					</div>
-				</Info>
-				<FollowBtn isFollowing={isFollowing} onClick={() => setIsFollowing((prev) => !prev)}>
-					<MdPersonAdd />
-					<span>{isFollowing ? "Unfollow" : "Follow"}</span>
-				</FollowBtn>
+						<div className="bio">
+							Lorem ipsum dolor, sit amet consectetur adipisicing elit. Enim, aliquam laudantium aut quo porro autem
+							voluptas eaque blanditiis natus ab
+						</div>
+					</Info>
+					{isMyProfile && (
+						<EditProfileBtn onClick={() => navigate(Paths.profileEdit)}>
+							<span>Edit Profile</span>
+						</EditProfileBtn>
+					)}
+					{!isMyProfile && (
+						<FollowBtn isFollowing={isFollowing} onClick={() => setIsFollowing((prev) => !prev)}>
+							<MdPersonAdd />
+							<span>{isFollowing ? "Unfollow" : "Follow"}</span>
+						</FollowBtn>
+					)}
+				</div>
 			</ProfileInfo>
 			<Tweets>
 				<Navigation>
@@ -82,11 +100,7 @@ function Profile() {
 
 export default Profile;
 
-interface IFollowBtn {
-	isFollowing: boolean;
-}
-
-const FollowBtn = styled.button<IFollowBtn>`
+const EditProfileBtn = styled.button`
 	align-self: flex-start;
 	margin-left: auto;
 	display: flex;
@@ -94,14 +108,30 @@ const FollowBtn = styled.button<IFollowBtn>`
 	gap: 0.5rem;
 	margin-top: 2rem;
 	color: white;
-	background-color: ${(props) => (props.isFollowing ? "#828282" : "#2f80ed")};
+	background-color: #2f80ed;
 	border-radius: 4px;
 	padding: 0.8rem 2.4rem;
+	white-space: nowrap;
 
 	span {
 		font-size: 1.2rem;
 		font-weight: 500;
 	}
+
+	@media (max-width: 900px) {
+		align-self: center;
+		margin-left: 0;
+		margin-bottom: 2rem;
+		margin-top: 0;
+	}
+`;
+
+interface IFollowBtn {
+	isFollowing: boolean;
+}
+
+const FollowBtn = styled(EditProfileBtn)<IFollowBtn>`
+	background-color: ${(props) => (props.isFollowing ? "#828282" : "#2f80ed")};
 `;
 
 const Info = styled.div`
@@ -117,6 +147,11 @@ const Info = styled.div`
 		font-size: 1.2rem;
 	}
 
+	.count {
+		display: flex;
+		gap: 2.6rem;
+	}
+
 	.bold {
 		font-weight: 600;
 		color: #333333;
@@ -129,6 +164,15 @@ const Info = styled.div`
 	.bio {
 		margin-top: 2.2rem;
 		font-size: 1.8rem;
+	}
+
+	@media (max-width: 900px) {
+		margin-top: 3.4rem;
+
+		.top {
+			flex-direction: column;
+			gap: 0.4rem;
+		}
 	}
 `;
 
@@ -155,19 +199,38 @@ const Picture = styled.div`
 		object-fit: cover;
 		object-position: center;
 	}
+
+	@media (max-width: 900px) {
+		width: 11.6rem;
+		height: 11.6rem;
+		padding: 0.3rem;
+		position: absolute;
+		top: -8rem;
+	}
 `;
 
 const ProfileInfo = styled.div`
-	max-width: 110rem;
 	margin: 0 auto;
-	background-color: white;
-	position: relative;
-	z-index: 2;
-	padding: 0.5rem 2.4rem;
-	box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.05);
-	border-radius: 12px;
-	display: flex;
-	gap: 2.4rem;
+	max-width: 110rem;
+	padding-inline: 2rem;
+
+	& > div {
+		background-color: white;
+		position: relative;
+		z-index: 2;
+		box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.05);
+		border-radius: 12px;
+		display: flex;
+		gap: 2.4rem;
+		padding: 0.5rem 2.4rem;
+	}
+
+	@media (max-width: 900px) {
+		& > div {
+			flex-direction: column;
+			align-items: center;
+		}
+	}
 `;
 
 const TweetsContainer = styled.div`
@@ -240,6 +303,7 @@ const CoverImg = styled.div`
 	overflow: hidden;
 	top: 0;
 	z-index: 1;
+	background-color: #828282;
 
 	img {
 		width: 100%;
@@ -247,9 +311,17 @@ const CoverImg = styled.div`
 		object-fit: cover;
 		object-position: center;
 	}
+
+	@media (max-width: 900px) {
+		height: 16.8rem;
+	}
 `;
 
 const Container = styled.div`
 	position: relative;
 	padding-top: 24.2rem;
+
+	@media (max-width: 900px) {
+		padding-top: 14.9rem;
+	}
 `;
