@@ -1,16 +1,42 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import styled, { keyframes } from "styled-components";
 import { useNavigate } from "react-router-dom";
 import BlankPNG from "../assets/blank-profile-picture.png";
 import { TbPhotoEdit } from "react-icons/tb";
 import { MdArrowBack } from "react-icons/md";
+import { useAppDispatch, useAppSelector } from "../store/hooks";
+import { authActions } from "../store/slices/authSlice";
+import useGetAllNames from "../hooks/profile/useGetAllNames";
+import useGetUserProfile from "../hooks/profile/useGetUserProfile";
+import useUpdateUserProfile from "../hooks/profile/useUpdateUserProfile";
+import { Paths } from "../routes";
 
-function ProfileEdit() {
+type Props = {
+	isSetup?: boolean;
+};
+
+function ProfileEdit({ isSetup }: Props) {
 	const [currentPhoto, setCurrentPhoto] = useState<File>();
 	const [enteredCover, setEnteredCover] = useState<File>();
 	const [enteredName, setEnteredName] = useState("");
+	const [enteredBio, setEnteredBio] = useState("");
+	const [userNameError, setUserNameError] = useState(false);
+	const [userNameTouched, setUserNameTouched] = useState(false);
 
 	const navigate = useNavigate();
+	const uid = useAppSelector((state) => state.auth.uid);
+	const dispatch = useAppDispatch();
+
+	const { data: allNames } = useGetAllNames();
+	const { data: userProfile } = useGetUserProfile(uid);
+	const { mutate: updateProfile, isLoading: updatingProfile } = useUpdateUserProfile();
+
+	useEffect(() => {
+		if (!userProfile) return;
+
+		setEnteredName(userProfile.displayName);
+		setEnteredBio(userProfile.bio);
+	}, [userProfile]);
 
 	function onPhotoChange(e: React.ChangeEvent<HTMLInputElement>) {
 		if (!e.currentTarget.files) return;
@@ -21,32 +47,68 @@ function ProfileEdit() {
 	function onCoverChange(e: React.ChangeEvent<HTMLInputElement>) {
 		if (!e.currentTarget.files) return;
 
-		console.log("shit");
 		setEnteredCover(e.currentTarget.files[0]);
 	}
 
 	function getPhotoSrc(): string {
 		if (currentPhoto) return URL.createObjectURL(currentPhoto);
-		// if (data) return data.photoURL || BlanckPicture;
+		if (userProfile) return userProfile.photoURL || BlankPNG;
 		else return BlankPNG;
 	}
 
 	function getCoverSrc(): string {
 		if (enteredCover) return URL.createObjectURL(enteredCover);
-		// if (data) return data.photoURL || BlanckPicture;
+		if (userProfile) return userProfile.coverURL || BlankPNG;
 		else return BlankPNG;
+	}
+
+	function validateNames(name: string) {
+		const existingName = allNames?.find((value) => name === value);
+
+		if (existingName && existingName !== userProfile?.displayName) setUserNameError(true);
+		else setUserNameError(false);
+	}
+
+	function onEnteredNameChanged(e: React.ChangeEvent<HTMLInputElement>) {
+		const name = e.target.value;
+		setEnteredName(name);
+
+		if (!userNameTouched) return;
+		validateNames(name);
+	}
+
+	function onEnteredNameBlured() {
+		setUserNameTouched(true);
+		validateNames(enteredName);
 	}
 
 	function onSave(e: React.FormEvent<HTMLFormElement>) {
 		e.preventDefault();
+
+		if (!uid) {
+			dispatch(authActions.logout());
+			return;
+		}
+
+		if (userNameError) return;
+
+		updateProfile(
+			{ bio: enteredBio, dispayName: enteredName, cover: enteredCover, photo: currentPhoto, uid },
+			{
+				onSuccess() {
+					if (isSetup) navigate(Paths.home, { replace: true });
+					else navigate(-1);
+				},
+			}
+		);
 	}
 
 	return (
-		<Container>
+		<Container isSetup={!!isSetup}>
 			<div>
-				<Heading>Profile Edit</Heading>
+				<Heading>Profile {isSetup ? "Setup" : "Edit"}</Heading>
 				<Cover>
-					<div>{enteredCover && <img src={getCoverSrc()} alt="cover" />}</div>
+					<div>{<img src={getCoverSrc()} alt="cover" />}</div>
 					<label htmlFor="cover">
 						<TbPhotoEdit />
 					</label>
@@ -61,7 +123,7 @@ function ProfileEdit() {
 					</label>
 					<input type="file" name="photo" id="photo" onChange={onPhotoChange} accept="image/*" />
 				</Picture>
-				<Form onSubmit={onSave}>
+				<Form onSubmit={onSave} isSetup={!!isSetup}>
 					<div>
 						<label htmlFor="displayName">Display Name</label>
 						<input
@@ -69,19 +131,31 @@ function ProfileEdit() {
 							name="displayName"
 							id="dispayName"
 							placeholder="Enter display name"
-							onChange={(e) => setEnteredName(e.target.value)}
+							onChange={onEnteredNameChanged}
+							onBlur={onEnteredNameBlured}
+							value={enteredName}
 							required
 						/>
+						{userNameError && <ErrorMessage>This username already exist.</ErrorMessage>}
 					</div>
 					<div>
 						<label htmlFor="bio">Bio</label>
-						<textarea name="bio" id="bio" placeholder="Enter Bio"></textarea>
+						<textarea
+							name="bio"
+							id="bio"
+							placeholder="Enter Bio"
+							required
+							onChange={(e) => setEnteredBio(e.target.value)}
+							value={enteredBio}
+						/>
 					</div>
 					<div className="buttons">
-						<Back onClick={() => navigate(-1)}>
-							<MdArrowBack /> Back
-						</Back>
-						<button type="submit">save</button>
+						{!isSetup && (
+							<Back onClick={() => navigate(-1)}>
+								<MdArrowBack /> Back
+							</Back>
+						)}
+						<button type="submit">save {updatingProfile && <Spinner />}</button>
 					</div>
 				</Form>
 			</div>
@@ -91,19 +165,26 @@ function ProfileEdit() {
 
 export default ProfileEdit;
 
-// const spinner = `
-//    100% {
-//     transform: rotate(360deg);
-//   }
-// `;
+const spinner = keyframes`
+   100% {
+    transform: rotate(360deg);
+  }
+`;
 
-// const Spinner = styled.div`
-// 	width: 1.5rem;
-// 	height: 1.5rem;
-// 	border-radius: 50%;
-// 	border-left: 2px solid white;
-// 	animation: ${spinner} 0.7s linear infinite;
-// `;
+const Spinner = styled.div`
+	width: 1.5rem;
+	height: 1.5rem;
+	border-radius: 50%;
+	border-left: 2px solid white;
+	animation: ${spinner} 0.7s linear infinite;
+`;
+
+const ErrorMessage = styled.div`
+	font-size: 1.4rem;
+	color: #ff414e;
+	margin-top: 1rem;
+	align-self: flex-start;
+`;
 
 const Back = styled.div`
 	color: #2f80ed;
@@ -115,7 +196,11 @@ const Back = styled.div`
 	text-decoration: none;
 `;
 
-const Form = styled.form`
+interface IForm {
+	isSetup: boolean;
+}
+
+const Form = styled.form<IForm>`
 	margin-top: 2.5rem;
 	display: flex;
 	flex-direction: column;
@@ -124,7 +209,9 @@ const Form = styled.form`
 	.buttons {
 		display: flex;
 		align-items: center;
-		justify-content: space-between;
+		justify-content: ${(props) => (props.isSetup ? "flex-end" : "space-between")};
+		/* justify-content: space-between; */
+		/* justify-content: flex-end; */
 	}
 
 	label {
@@ -232,10 +319,15 @@ const Heading = styled.div`
 	}
 `;
 
-const Container = styled.div`
+interface IContainer {
+	isSetup: boolean;
+}
+
+const Container = styled.div<IContainer>`
 	display: grid;
 	place-items: center;
-	height: 100%;
+	height: ${(props) => (props.isSetup ? "100vh" : "100%")};
+	background-color: #f2f2f2;
 
 	& > div {
 		padding: 3rem 5.8rem;
@@ -248,9 +340,9 @@ const Container = styled.div`
 
 	@media only screen and (max-width: 473px) {
 		place-items: start;
+		background-color: white;
 
 		& > div {
-			/* background-color: inherit; */
 			box-shadow: none;
 			padding: 2rem;
 		}

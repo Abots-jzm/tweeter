@@ -12,6 +12,7 @@ import { Paths } from "../routes";
 import useLogout from "../hooks/auth/useLogout";
 import { motion } from "framer-motion";
 import { useAppSelector } from "../store/hooks";
+import useGetUserProfile from "../hooks/profile/useGetUserProfile";
 
 type Props = {
 	children: React.ReactNode;
@@ -22,6 +23,7 @@ function Layout({ children }: Props) {
 	const [logoutModalOpen, setLogoutModalOpen] = useState(false);
 	const navigate = useNavigate();
 	const userId = useAppSelector((state) => state.auth.uid);
+	const { data: userProfile } = useGetUserProfile(userId);
 
 	function toggleLogoutModal(e: React.MouseEvent<HTMLDivElement>) {
 		e.stopPropagation();
@@ -30,7 +32,6 @@ function Layout({ children }: Props) {
 
 	function onProfileClicked() {
 		setLogoutModalOpen(false);
-		// navigate(Paths.profile + "?filter=tweet");
 		navigate(`${Paths.profile}/${userId}?filter=tweet`);
 	}
 
@@ -57,12 +58,12 @@ function Layout({ children }: Props) {
 						{location.pathname === Paths.bookmarks ? <ActiveBar layoutId="active" /> : <Bar />}
 					</Tab>
 				</Tabs>
-				<Profile>
+				<Profile onClick={toggleLogoutModal}>
 					<div className="photo">
-						<img src={BlankPNG} alt={"name" + " pic"} />
+						<img src={userProfile?.photoURL || BlankPNG} alt={userProfile?.displayName + " pic"} />
 					</div>
-					<div className="name">Xanthe Neal</div>
-					<Icon onClick={toggleLogoutModal}>
+					<div className="name">{userProfile?.displayName}</div>
+					<Icon>
 						<AiOutlineCaretDown />
 						<LogoutModal isOpen={logoutModalOpen} onClick={(e) => e.stopPropagation()}>
 							<div className="profile" onClick={onProfileClicked}>
@@ -193,6 +194,7 @@ const LogoutModal = styled.div<ILogoutModal>`
 	flex-direction: column;
 	gap: 2.4rem;
 	z-index: 5;
+	cursor: default;
 
 	& > div {
 		padding: 1.1rem;
@@ -238,13 +240,13 @@ const Icon = styled.div`
 	color: #333333;
 	font-size: 1.2rem;
 	position: relative;
-	cursor: pointer;
 `;
 
 const Profile = styled.div`
 	display: flex;
 	gap: 1.1rem;
 	align-items: center;
+	cursor: pointer;
 
 	.photo {
 		overflow: hidden;

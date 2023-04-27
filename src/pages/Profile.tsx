@@ -7,6 +7,7 @@ import BlankPNG from "../assets/blank-profile-picture.png";
 import { MdPersonAdd } from "react-icons/md";
 import { Paths } from "../routes";
 import { useAppSelector } from "../store/hooks";
+import useGetUserProfile from "../hooks/profile/useGetUserProfile";
 
 type Tab = "tweet" | "replies" | "media" | "likes";
 
@@ -14,6 +15,8 @@ function Profile() {
 	const [isFollowing, setIsFollowing] = useState(false);
 	const [searchParams, setSearchParams] = useSearchParams({ filter: "tweet" });
 	const { id } = useParams();
+	const { data: userProfile } = useGetUserProfile(id!);
+
 	const userId = useAppSelector((state) => state.auth.uid);
 	const activeTab = searchParams.get("filter") as Tab;
 	const navigate = useNavigate();
@@ -23,18 +26,18 @@ function Profile() {
 	return (
 		<Container>
 			<CoverImg>
-				<img src="https://4kwallpapers.com/images/walls/thumbs_2t/10362.jpg" alt="cover" />
+				{userProfile?.coverURL && <img src={userProfile.coverURL} alt={userProfile.displayName + " cover image"} />}
 			</CoverImg>
 			<ProfileInfo>
 				<div>
 					<Picture>
 						<div>
-							<img src={BlankPNG} alt="picture" />
+							<img src={userProfile?.photoURL || BlankPNG} alt={userProfile?.displayName + " picture"} />
 						</div>
 					</Picture>
 					<Info>
 						<div className="top">
-							<div className="name bold">Daniel Jensen</div>
+							<div className="name bold">{userProfile?.displayName}</div>
 							<div className="count">
 								<div>
 									<span className="bold">2,569</span> Following
@@ -44,10 +47,7 @@ function Profile() {
 								</div>
 							</div>
 						</div>
-						<div className="bio">
-							Lorem ipsum dolor, sit amet consectetur adipisicing elit. Enim, aliquam laudantium aut quo porro autem
-							voluptas eaque blanditiis natus ab
-						</div>
+						<div className="bio">{userProfile?.bio}</div>
 					</Info>
 					{isMyProfile && (
 						<EditProfileBtn onClick={() => navigate(Paths.profileEdit)}>

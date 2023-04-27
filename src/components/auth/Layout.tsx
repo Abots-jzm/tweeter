@@ -8,6 +8,7 @@ import { Paths } from "../../routes";
 import LogoSVG from "../../assets/tweeter.svg";
 import useGuestLogin from "../../hooks/auth/useGuestLogin";
 import useGoogleLogin from "../../hooks/auth/useGoogleLogin";
+import useGetUserProfile from "../../hooks/profile/useGetUserProfile";
 
 type Props = {
 	enteredEmail: string;
@@ -36,6 +37,8 @@ function Layout({
 	const navigate = useNavigate();
 	const isLoginPage = location.pathname === Paths.auth.login;
 
+	// const {data: userProfile} = useGetUserProfile();
+
 	const { mutate: googleLogin, isLoading: googleIsLoading, isError: googleIsError } = useGoogleLogin();
 	const [googleErrorMessage, setGoogleErrorMessage] = useState("");
 
@@ -57,6 +60,7 @@ function Layout({
 		guestLogin(undefined, {
 			onSuccess() {
 				navigate(nextPath || Paths.home, { replace: true });
+				// navigate(Paths.profileSetup, { replace: true });
 			},
 			onError() {
 				setGuestErrorMessage("An unexpected error occured");

@@ -16,12 +16,15 @@ function App() {
 			<Route path="/" element={<Navigate to={Paths.home} replace />} />
 			<Route path={Paths.auth.login} element={<Login />} />
 			<Route path={Paths.auth.signup} element={<SignUp />} />
-			<Route element={<RequireAuth />}>
+			<Route element={<RequireAuth showLayout />}>
 				<Route path={Paths.home} element={<Home />} />
 				<Route path={Paths.explore} element={<Explore />} />
 				<Route path={Paths.bookmarks} element={<Bookmarks />} />
 				<Route path={Paths.profile + "/:id"} element={<Profile />} />
 				<Route path={Paths.profileEdit} element={<ProfileEdit />} />
+			</Route>
+			<Route element={<RequireAuth />}>
+				<Route path={Paths.profileSetup} element={<ProfileEdit isSetup />} />
 			</Route>
 		</Routes>
 	);

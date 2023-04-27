@@ -6,9 +6,15 @@ import { auth } from "../../api/firebase";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import { authActions } from "../../store/slices/authSlice";
 import Layout from "../Layout";
+import useGetUserProfile from "../../hooks/profile/useGetUserProfile";
 
-function RequireAuth() {
+type Props = {
+	showLayout?: boolean;
+};
+
+function RequireAuth({ showLayout }: Props) {
 	const user = useAppSelector((state) => state.auth.uid);
+	const { data: userProfile, isLoading: profileIsLoading } = useGetUserProfile(user);
 	const location = useLocation();
 	const dispatch = useAppDispatch();
 
@@ -21,11 +27,13 @@ function RequireAuth() {
 
 	return (
 		<>
-			{user && (
+			{user && !userProfile && !profileIsLoading && <Navigate to={Paths.profileSetup} replace />}
+			{user && showLayout && (
 				<Layout>
 					<Outlet />
 				</Layout>
 			)}
+			{user && !showLayout && <Outlet />}
 			{!user && <Navigate to={Paths.auth.login} state={{ from: location }} replace />}
 		</>
 	);

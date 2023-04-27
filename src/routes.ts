@@ -8,4 +8,5 @@ export const Paths = {
 	bookmarks: "/bookmarks",
 	profile: "/profile",
 	profileEdit: "/profile-edit",
+	profileSetup: "/profile-setup",
 };
