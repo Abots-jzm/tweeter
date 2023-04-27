@@ -14,21 +14,5 @@ function useGetUserProfile(userId: string | null) {
 		select: (data) => data.data() as UserData,
 	});
 }
-// function useGetUserProfile(enabled?: boolean, nextPath?: string) {
-// 	const userId = useAppSelector((state) => state.auth.uid);
-// 	const navigate = useNavigate();
-
-// 	return useQuery(["user-profile"], () => getUserProfile(userId!), {
-// 		enabled: enabled ?? true,
-// 		refetchOnWindowFocus: false,
-// 		select: (data) => data.data() as UserData,
-// 		onSuccess(data) {
-// 			if (enabled === undefined) return;
-
-// 			if (!data) navigate(paths.PROFILE, { replace: true });
-// 			else navigate(nextPath || paths.WELCOME, { replace: true });
-// 		},
-// 	});
-// }
 
 export default useGetUserProfile;

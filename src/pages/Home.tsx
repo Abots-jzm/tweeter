@@ -11,6 +11,10 @@ function Home() {
 		<Container>
 			<div className="left">
 				<TweetSomething replyModalOpen={replyModalOpen} setReplyModalOpen={setReplyModalOpen} />
+				<MobileRecs>
+					<Person truncate />
+					<Person truncate />
+				</MobileRecs>
 				<TweetsContainer>
 					<Tweet
 						retweeted="Daniel Johnson"
@@ -56,6 +60,21 @@ const Heading = styled.div`
 	border-bottom: 1px solid #e0e0e0;
 	font-size: 1.2rem;
 	margin-bottom: 1.9rem;
+`;
+
+const MobileRecs = styled.div`
+	align-self: flex-start;
+	width: 100%;
+	padding: 1rem 2rem;
+	background-color: #ffffff;
+	box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.05);
+	border-radius: 12px;
+	display: none;
+	margin-top: 2.4rem;
+
+	@media only screen and (max-width: 900px) {
+		display: block;
+	}
 `;
 
 const Container = styled.div`

@@ -28,12 +28,12 @@ function RequireAuth({ showLayout }: Props) {
 	return (
 		<>
 			{user && !userProfile && !profileIsLoading && <Navigate to={Paths.profileSetup} replace />}
-			{user && showLayout && (
+			{user && userProfile && showLayout && (
 				<Layout>
 					<Outlet />
 				</Layout>
 			)}
-			{user && !showLayout && <Outlet />}
+			{user && userProfile && !showLayout && <Outlet />}
 			{!user && <Navigate to={Paths.auth.login} state={{ from: location }} replace />}
 		</>
 	);
