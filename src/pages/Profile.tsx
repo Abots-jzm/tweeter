@@ -164,6 +164,7 @@ const Info = styled.div`
 	.bio {
 		margin-top: 2.2rem;
 		font-size: 1.8rem;
+		white-space: pre-line;
 	}
 
 	@media (max-width: 900px) {

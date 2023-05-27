@@ -22,7 +22,7 @@ async function updateProfile(payload: UpdateProfilePayload) {
 		coverUrl = await getDownloadURL(snapShot.ref);
 	}
 
-	const user: UserData = { displayName: payload.dispayName, bio: payload.bio };
+	const user: UserData = { displayName: payload.displayName, bio: payload.bio };
 	if (photoUrl) user.photoURL = photoUrl;
 	if (coverUrl) user.coverURL = coverUrl;
 
