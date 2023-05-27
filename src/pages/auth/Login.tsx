@@ -1,12 +1,13 @@
-import React, { FormEvent, useState } from "react";
+import React, { useState } from "react";
 import Layout from "../../components/auth/Layout";
 import useLogin from "../../hooks/auth/useLogin";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Paths } from "../../routes";
+import { useForm } from "react-hook-form";
+import { EmailAndPassword } from "../../hooks/auth/types";
 
 function Login() {
-	const [enteredEmail, setEnteredEmail] = useState("");
-	const [enteredPassword, setEnteredPassword] = useState("");
+	const { register, handleSubmit } = useForm<EmailAndPassword>();
 
 	const { mutate: login, isLoading, isError } = useLogin();
 	const [errorMessage, setErrorMessage] = useState("");
@@ -17,13 +18,9 @@ function Login() {
 
 	const navigate = useNavigate();
 
-	function handleSubmit(e: FormEvent<HTMLFormElement>) {
-		e.preventDefault();
+	function onSubmit({ email, password }: EmailAndPassword) {
 		login(
-			{
-				email: enteredEmail,
-				password: enteredPassword,
-			},
+			{ email, password },
 			{
 				onSuccess() {
 					navigate(Paths.home, { replace: true });
@@ -43,15 +40,12 @@ function Login() {
 
 	return (
 		<Layout
-			enteredEmail={enteredEmail}
-			enteredPassword={enteredPassword}
+			register={register}
 			errorMessage={errorMessage}
 			errorMessageIsShown={isError}
 			isLoading={isLoading}
 			nextPath={nextPath}
-			handleSubmit={handleSubmit}
-			onEmailChange={(e) => setEnteredEmail(e.target.value)}
-			onPasswordChange={(e) => setEnteredPassword(e.target.value)}
+			handleSubmit={handleSubmit(onSubmit)}
 		/>
 	);
 }

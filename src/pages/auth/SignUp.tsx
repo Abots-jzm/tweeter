@@ -1,32 +1,28 @@
-import React, { FormEvent, useState } from "react";
+import React, { useState } from "react";
 import Layout from "../../components/auth/Layout";
 import useSignup from "../../hooks/auth/useSignup";
 import { useNavigate } from "react-router-dom";
 import { Paths } from "../../routes";
+import { useForm } from "react-hook-form";
+import { EmailAndPassword } from "../../hooks/auth/types";
 
 function SignUp() {
-	const [enteredEmail, setEnteredEmail] = useState("");
-	const [enteredPassword, setEnteredPassword] = useState("");
-
+	const { register, handleSubmit } = useForm<EmailAndPassword>();
 	const [errorMessage, setErrorMessage] = useState("");
 	const [errorMessageIsShown, setErrorMessageIsShown] = useState(false);
 	const { mutate: signup, isLoading } = useSignup();
 
 	const navigate = useNavigate();
 
-	async function handleSubmit(e: FormEvent<HTMLFormElement>) {
-		if (enteredPassword.length < 6) {
+	async function onSubmit({ email, password }: EmailAndPassword) {
+		if (password.length < 6) {
 			setErrorMessage("Password should be at least 6 characters");
 			setErrorMessageIsShown(true);
 			return;
 		}
 
-		e.preventDefault();
 		signup(
-			{
-				email: enteredEmail,
-				password: enteredPassword,
-			},
+			{ email, password },
 			{
 				onSuccess() {
 					navigate(Paths.profileSetup, { replace: true });
@@ -46,14 +42,11 @@ function SignUp() {
 
 	return (
 		<Layout
-			enteredEmail={enteredEmail}
-			enteredPassword={enteredPassword}
+			register={register}
 			errorMessage={errorMessage}
 			errorMessageIsShown={errorMessageIsShown}
 			isLoading={isLoading}
-			handleSubmit={handleSubmit}
-			onEmailChange={(e) => setEnteredEmail(e.target.value)}
-			onPasswordChange={(e) => setEnteredPassword(e.target.value)}
+			handleSubmit={handleSubmit(onSubmit)}
 		/>
 	);
 }

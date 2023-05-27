@@ -1,4 +1,4 @@
-import { ChangeEvent, FormEvent, useState } from "react";
+import { FormEvent, useState } from "react";
 import { FaGoogle } from "react-icons/fa";
 import { IoMdLock } from "react-icons/io";
 import { MdEmail } from "react-icons/md";
@@ -8,36 +8,22 @@ import { Paths } from "../../routes";
 import LogoSVG from "../../assets/tweeter.svg";
 import useGuestLogin from "../../hooks/auth/useGuestLogin";
 import useGoogleLogin from "../../hooks/auth/useGoogleLogin";
-import useGetUserProfile from "../../hooks/profile/useGetUserProfile";
+import { EmailAndPassword } from "../../hooks/auth/types";
+import { UseFormRegister } from "react-hook-form";
 
 type Props = {
-	enteredEmail: string;
-	enteredPassword: string;
+	register: UseFormRegister<EmailAndPassword>;
 	errorMessage: string;
 	errorMessageIsShown: boolean;
 	isLoading: boolean;
 	nextPath?: string;
 	handleSubmit: (e: FormEvent<HTMLFormElement>) => void;
-	onEmailChange: (e: ChangeEvent<HTMLInputElement>) => void;
-	onPasswordChange: (e: ChangeEvent<HTMLInputElement>) => void;
 };
 
-function Layout({
-	enteredEmail,
-	enteredPassword,
-	errorMessage,
-	errorMessageIsShown,
-	isLoading,
-	nextPath,
-	handleSubmit,
-	onEmailChange,
-	onPasswordChange,
-}: Props) {
+function Layout({ register, errorMessage, errorMessageIsShown, isLoading, nextPath, handleSubmit }: Props) {
 	const location = useLocation();
 	const navigate = useNavigate();
 	const isLoginPage = location.pathname === Paths.auth.login;
-
-	// const {data: userProfile} = useGetUserProfile();
 
 	const { mutate: googleLogin, isLoading: googleIsLoading, isError: googleIsError } = useGoogleLogin();
 	const [googleErrorMessage, setGoogleErrorMessage] = useState("");
@@ -47,8 +33,10 @@ function Layout({
 
 	async function onGoogleSubmit() {
 		googleLogin(undefined, {
-			onSuccess() {
-				navigate(nextPath || Paths.home, { replace: true });
+			onSuccess({ user }) {
+				const isNewUser = user.metadata.creationTime === user.metadata.lastSignInTime;
+				if (isNewUser) navigate(Paths.profileSetup);
+				else navigate(nextPath || Paths.home, { replace: true });
 			},
 			onError() {
 				setGoogleErrorMessage("An unexpected error occured");
@@ -58,9 +46,10 @@ function Layout({
 
 	async function onGuestSubmit() {
 		guestLogin(undefined, {
-			onSuccess() {
-				navigate(nextPath || Paths.home, { replace: true });
-				// navigate(Paths.profileSetup, { replace: true });
+			onSuccess({ user }) {
+				const isNewUser = user.metadata.creationTime === user.metadata.lastSignInTime;
+				if (isNewUser) navigate(Paths.profileSetup);
+				else navigate(nextPath || Paths.home, { replace: true });
 			},
 			onError() {
 				setGuestErrorMessage("An unexpected error occured");
@@ -80,29 +69,13 @@ function Layout({
 						<p>
 							<MdEmail />
 						</p>
-						<input
-							type="email"
-							name="email"
-							id="email"
-							placeholder="Email"
-							value={enteredEmail}
-							onChange={onEmailChange}
-							required
-						/>
+						<input type="email" id="email" placeholder="Email" required {...register("email")} />
 					</div>
 					<div>
 						<p>
 							<IoMdLock />
 						</p>
-						<input
-							type="password"
-							name="password"
-							id="password"
-							placeholder="Password"
-							value={enteredPassword}
-							onChange={onPasswordChange}
-							required
-						/>
+						<input type="password" id="password" placeholder="Password" required {...register("password")} />
 					</div>
 					<LoginBtn type="submit">
 						<div>{isLoginPage ? "Login" : "Sign up"}</div>

@@ -7,7 +7,7 @@ import { AiOutlineCaretDown } from "react-icons/ai";
 import { HiUserCircle } from "react-icons/hi";
 import { MdHome, MdExplore, MdBookmark } from "react-icons/md";
 import { TbLogout } from "react-icons/tb";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Paths } from "../routes";
 import useLogout from "../hooks/auth/useLogout";
 import { motion } from "framer-motion";
@@ -23,7 +23,7 @@ function Layout({ children }: Props) {
 	const [logoutModalOpen, setLogoutModalOpen] = useState(false);
 	const navigate = useNavigate();
 	const userId = useAppSelector((state) => state.auth.uid);
-	const { data: userProfile } = useGetUserProfile(userId);
+	const { data: userProfile, isLoading: profileLoading } = useGetUserProfile(userId);
 
 	function toggleLogoutModal(e: React.MouseEvent<HTMLDivElement>) {
 		e.stopPropagation();
@@ -58,30 +58,33 @@ function Layout({ children }: Props) {
 						{location.pathname === Paths.bookmarks ? <ActiveBar layoutId="active" /> : <Bar />}
 					</Tab>
 				</Tabs>
-				<Profile onClick={toggleLogoutModal}>
-					<div className="photo">
-						<img src={userProfile?.photoURL || BlankPNG} alt={userProfile?.displayName + " pic"} />
-					</div>
-					<div className="name">{userProfile?.displayName}</div>
-					<Icon>
-						<AiOutlineCaretDown />
-						<LogoutModal isOpen={logoutModalOpen} onClick={(e) => e.stopPropagation()}>
-							<div className="profile" onClick={onProfileClicked}>
-								<p>
-									<HiUserCircle />
-								</p>
-								My Profile
-							</div>
-							<p className="line" />
-							<div className="logout" onClick={() => logout()}>
-								<p>
-									<TbLogout />
-								</p>
-								Logout
-							</div>
-						</LogoutModal>
-					</Icon>
-				</Profile>
+				{(userProfile || profileLoading) && (
+					<Profile onClick={toggleLogoutModal}>
+						<div className="photo">
+							<img src={userProfile?.photoURL || BlankPNG} alt={userProfile?.displayName + " pic"} />
+						</div>
+						<div className="name">{userProfile?.displayName}</div>
+						<Icon>
+							<AiOutlineCaretDown />
+							<LogoutModal isOpen={logoutModalOpen} onClick={(e) => e.stopPropagation()}>
+								<div className="profile" onClick={onProfileClicked}>
+									<p>
+										<HiUserCircle />
+									</p>
+									My Profile
+								</div>
+								<p className="line" />
+								<div className="logout" onClick={() => logout()}>
+									<p>
+										<TbLogout />
+									</p>
+									Logout
+								</div>
+							</LogoutModal>
+						</Icon>
+					</Profile>
+				)}
+				{!userProfile && !profileLoading && <CompleteProfile to={Paths.profileSetup}>complete profile</CompleteProfile>}
 			</Header>
 			<Outlet>{children}</Outlet>
 			<MobileNav>
@@ -108,6 +111,16 @@ function Layout({ children }: Props) {
 }
 
 export default Layout;
+
+const CompleteProfile = styled(Link)`
+	border: 1px solid #828282;
+	padding: 0.8rem 1.4rem;
+	border-radius: 8px;
+	font-weight: 400;
+	text-decoration: none;
+	color: #828282;
+	font-size: 1.2rem;
+`;
 
 const MobileNav = styled.nav`
 	display: none;

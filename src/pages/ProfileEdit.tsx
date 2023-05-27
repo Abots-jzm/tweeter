@@ -58,8 +58,7 @@ function ProfileEdit({ isSetup }: Props) {
 
 	function getCoverSrc(): string {
 		if (enteredCover) return URL.createObjectURL(enteredCover);
-		if (userProfile) return userProfile.coverURL || BlankPNG;
-		else return BlankPNG;
+		return userProfile?.coverURL || "";
 	}
 
 	function validateNames(name: string) {
@@ -108,7 +107,7 @@ function ProfileEdit({ isSetup }: Props) {
 			<div>
 				<Heading>Profile {isSetup ? "Setup" : "Edit"}</Heading>
 				<Cover>
-					<div>{<img src={getCoverSrc()} alt="cover" />}</div>
+					<div>{(userProfile?.coverURL || enteredCover) && <img src={getCoverSrc()} alt="cover" />}</div>
 					<label htmlFor="cover">
 						<TbPhotoEdit />
 					</label>
