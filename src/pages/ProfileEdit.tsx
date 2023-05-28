@@ -31,18 +31,16 @@ function ProfileEdit({ isSetup }: Props) {
 	const { data: allNames } = useGetAllNames();
 	const { data: userProfile } = useGetUserProfile(uid);
 	const { mutate: updateProfile, isLoading: updatingProfile } = useUpdateUserProfile();
-	const {
-		register,
-		handleSubmit,
-		watch,
-		formState: { errors, isDirty, isValid },
-	} = useForm<FormValues>({
+
+	const { register, handleSubmit, watch, formState } = useForm<FormValues>({
 		values: { displayName: userProfile?.displayName || "", bio: userProfile?.bio || "" },
 		mode: "onTouched",
 	});
+	const { errors, isDirty, isValid } = formState;
 
 	function getPhotoSrc(): string {
 		const photo = watch("photo")?.[0];
+
 		if (photo) return URL.createObjectURL(photo);
 		if (userProfile) return userProfile.photoURL || BlankPNG;
 		else return BlankPNG;
@@ -50,6 +48,7 @@ function ProfileEdit({ isSetup }: Props) {
 
 	function getCoverSrc(): string {
 		const cover = watch("cover")?.[0];
+
 		if (cover) return URL.createObjectURL(cover);
 		return userProfile?.coverURL || "";
 	}

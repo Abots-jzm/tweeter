@@ -8,15 +8,17 @@ type Props = {
 	setReplyModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
+type TweetAccessibility = "everyone" | "people you follow";
+
 function TweetSomething({ replyModalOpen, setReplyModalOpen }: Props) {
-	const [replyType, setReplyType] = useState<"everyone" | "people you follow">("everyone");
+	const [replyType, setReplyType] = useState<TweetAccessibility>("everyone");
 	const textAreaRef = useRef<HTMLTextAreaElement>(null);
 
 	function onTweetSubmit(e: FormEvent<HTMLFormElement>) {
 		e.preventDefault();
 	}
 
-	function onTextAreaInput() {
+	function AdjustTextAreaHeight() {
 		if (!textAreaRef.current) return;
 		textAreaRef.current.style.height = "";
 		textAreaRef.current.style.height = textAreaRef.current.scrollHeight + "px";
@@ -51,7 +53,7 @@ function TweetSomething({ replyModalOpen, setReplyModalOpen }: Props) {
 							name="tweet"
 							id="tweet"
 							placeholder="What's happening?"
-							onInput={onTextAreaInput}
+							onInput={AdjustTextAreaHeight}
 						/>
 					</div>
 					<Bottom>

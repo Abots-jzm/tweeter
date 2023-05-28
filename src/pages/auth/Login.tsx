@@ -6,6 +6,9 @@ import { Paths } from "../../routes";
 import { useForm } from "react-hook-form";
 import { EmailAndPassword } from "../../hooks/auth/types";
 
+const WRONG_PASSWORD_MESSAGE = "Firebase: Error (auth/wrong-password).";
+const USER_NOT_FOUND_MESSAGE = "Firebase: Error (auth/user-not-found).";
+
 function Login() {
 	const { register, handleSubmit } = useForm<EmailAndPassword>();
 
@@ -18,24 +21,17 @@ function Login() {
 
 	const navigate = useNavigate();
 
-	function onSubmit({ email, password }: EmailAndPassword) {
-		login(
-			{ email, password },
-			{
-				onSuccess() {
-					navigate(Paths.home, { replace: true });
-				},
-				onError(err: any) {
-					console.log(err.message);
-					if (
-						err?.message === "Firebase: Error (auth/wrong-password)." ||
-						err?.message === "Firebase: Error (auth/user-not-found)."
-					)
-						setErrorMessage("Invalid Email or Password");
-					else setErrorMessage("An unexpected error occured");
-				},
-			}
-		);
+	function onLoginFormSubmit(credentials: EmailAndPassword) {
+		login(credentials, {
+			onSuccess() {
+				navigate(Paths.home, { replace: true });
+			},
+			onError(err: any) {
+				const credentialAreInvalid = err?.message === WRONG_PASSWORD_MESSAGE || err?.message === USER_NOT_FOUND_MESSAGE;
+				if (credentialAreInvalid) setErrorMessage("Invalid Email or Password");
+				else setErrorMessage("An unexpected error occured");
+			},
+		});
 	}
 
 	return (
@@ -45,7 +41,7 @@ function Login() {
 			errorMessageIsShown={isError}
 			isLoading={isLoading}
 			nextPath={nextPath}
-			handleSubmit={handleSubmit(onSubmit)}
+			handleSubmit={handleSubmit(onLoginFormSubmit)}
 		/>
 	);
 }

@@ -13,15 +13,16 @@ type Tab = "tweet" | "replies" | "media" | "likes";
 
 function Profile() {
 	const [isFollowing, setIsFollowing] = useState(false);
+
 	const [searchParams, setSearchParams] = useSearchParams({ filter: "tweet" });
 	const { id } = useParams();
-	const { data: userProfile } = useGetUserProfile(id!);
 
+	const { data: userProfile } = useGetUserProfile(id!);
 	const userId = useAppSelector((state) => state.auth.uid);
+	const isMyProfile = id === userId;
+
 	const activeTab = searchParams.get("filter") as Tab;
 	const navigate = useNavigate();
-
-	const isMyProfile = id === userId;
 
 	return (
 		<Container>

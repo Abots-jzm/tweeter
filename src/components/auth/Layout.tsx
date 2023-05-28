@@ -35,6 +35,7 @@ function Layout({ register, errorMessage, errorMessageIsShown, isLoading, nextPa
 		googleLogin(undefined, {
 			onSuccess({ user }) {
 				const isNewUser = user.metadata.creationTime === user.metadata.lastSignInTime;
+
 				if (isNewUser) navigate(Paths.profileSetup);
 				else navigate(nextPath || Paths.home, { replace: true });
 			},
@@ -48,6 +49,7 @@ function Layout({ register, errorMessage, errorMessageIsShown, isLoading, nextPa
 		guestLogin(undefined, {
 			onSuccess({ user }) {
 				const isNewUser = user.metadata.creationTime === user.metadata.lastSignInTime;
+
 				if (isNewUser) navigate(Paths.profileSetup);
 				else navigate(nextPath || Paths.home, { replace: true });
 			},
@@ -69,13 +71,13 @@ function Layout({ register, errorMessage, errorMessageIsShown, isLoading, nextPa
 						<p>
 							<MdEmail />
 						</p>
-						<input type="email" id="email" placeholder="Email" required {...register("email")} />
+						<input {...register("email")} type="email" id="email" placeholder="Email" required />
 					</div>
 					<div>
 						<p>
 							<IoMdLock />
 						</p>
-						<input type="password" id="password" placeholder="Password" required {...register("password")} />
+						<input {...register("password")} type="password" id="password" placeholder="Password" required />
 					</div>
 					<LoginBtn type="submit">
 						<div>{isLoginPage ? "Login" : "Sign up"}</div>
