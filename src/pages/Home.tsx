@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import styled from "styled-components";
 import TweetSomething from "../components/tweets/TweetSomething";
 import Tweet from "../components/tweets/Tweet";
 import Person from "../components/tweets/Person";
@@ -8,14 +7,14 @@ function Home() {
 	const [replyModalOpen, setReplyModalOpen] = useState(false);
 
 	return (
-		<Container>
-			<div className="left">
+		<div className="mx-auto my-0 flex max-w-[1100px] gap-6 px-5 py-6">
+			<div className="flex-1">
 				<TweetSomething replyModalOpen={replyModalOpen} setReplyModalOpen={setReplyModalOpen} />
-				<MobileRecs>
+				<div className="mt-6 block w-full self-start rounded-xl bg-white px-2.5 py-5 shadow-soft lg:hidden">
 					<Person truncate />
 					<Person truncate />
-				</MobileRecs>
-				<TweetsContainer>
+				</div>
+				<div className="my-6 flex flex-col gap-6">
 					<Tweet
 						retweeted="Daniel Johnson"
 						image="https://images.immediate.co.uk/production/volatile/sites/30/2022/07/Black-beans-avocado-on-toast-d351aa6.jpg?quality=90&webp=true&fit=700,350"
@@ -24,80 +23,20 @@ function Home() {
 						Lorem ipsum dolor sit amet consectetur adipisicing elit. Eum omnis odit cupiditate molestiae ad hic
 						consequatur eius quo dolor minus. In deserunt sunt architecto doloremque eius, fugiat recusandae ipsam eos.
 					</Tweet>
-				</TweetsContainer>
+				</div>
 			</div>
-			<div className="right">
-				<Heading>Who to follow</Heading>
-				<People>
+			<div className="hidden basis-[306px] self-start rounded-xl bg-white px-5 py-3.5 shadow-soft lg:block">
+				<p className="mb-5 border-b border-b-[#e0e0e0] pb-2 font-poppins text-xs font-semibold text-[#4f4f4f]">
+					Who to follow
+				</p>
+				<div className="flex flex-col">
 					<Person truncate />
 					<Person truncate />
 					<Person truncate />
-				</People>
+				</div>
 			</div>
-		</Container>
+		</div>
 	);
 }
 
 export default Home;
-
-const TweetsContainer = styled.div`
-	display: flex;
-	flex-direction: column;
-	margin: 2.4rem 0;
-	gap: 2.4rem;
-`;
-
-const People = styled.div`
-	display: flex;
-	flex-direction: column;
-`;
-
-const Heading = styled.div`
-	color: #4f4f4f;
-	font-family: "Poppins", sans-serif;
-	font-weight: 600;
-	padding-bottom: 0.8rem;
-	border-bottom: 1px solid #e0e0e0;
-	font-size: 1.2rem;
-	margin-bottom: 1.9rem;
-`;
-
-const MobileRecs = styled.div`
-	align-self: flex-start;
-	width: 100%;
-	padding: 1rem 2rem;
-	background-color: #ffffff;
-	box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.05);
-	border-radius: 12px;
-	display: none;
-	margin-top: 2.4rem;
-
-	@media only screen and (max-width: 900px) {
-		display: block;
-	}
-`;
-
-const Container = styled.div`
-	max-width: 110rem;
-	margin: 0 auto;
-	padding: 2.5rem 2rem;
-	display: flex;
-	gap: 2.5rem;
-
-	& > .left {
-		flex: 1;
-	}
-
-	& > .right {
-		align-self: flex-start;
-		flex-basis: 30.6rem;
-		padding: 1rem 2rem;
-		background-color: #ffffff;
-		box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.05);
-		border-radius: 12px;
-
-		@media only screen and (max-width: 900px) {
-			display: none;
-		}
-	}
-`;

@@ -3,7 +3,34 @@
 /* font-family: 'Noto Sans', sans-serif; */
 /* font-family: 'Poppins', sans-serif; */
 
-*,
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+	.login-btn {
+		@apply flex items-center justify-center gap-[20px] rounded-lg bg-primaryBlue p-2 font-bold text-white;
+	}
+
+	.error-message {
+		@apply mt-2.5 self-start text-sm text-errorRed;
+	}
+
+	.spinner {
+		@apply h-5 w-5 animate-spin rounded-full border-l-2 border-white;
+	}
+
+	.image-center {
+		@apply h-full w-full object-cover object-center;
+	}
+}
+
+body {
+	font-family: "Noto Sans", sans-serif;
+	font-weight: 400;
+}
+
+/* *,
 *::before,
 *::after {
 	padding: 0;
@@ -11,20 +38,8 @@
 	box-sizing: border-box;
 }
 
-html {
-	font-size: 62.5%;
-	scroll-behavior: smooth;
-	-webkit-tap-highlight-color: rgba(0, 0, 0, 0);
-	-webkit-tap-highlight-color: transparent;
-}
 
-body {
-	font-size: 1.6rem;
-	font-family: "Noto Sans", sans-serif;
-	font-weight: 400;
-}
-
-button {
+/* button {
 	font: inherit;
 	border: none;
 	outline: none;
@@ -37,4 +52,4 @@ img {
 
 input {
 	font: inherit;
-}
+} */

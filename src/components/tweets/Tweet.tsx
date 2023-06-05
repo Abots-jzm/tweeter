@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { MdBookmarkBorder, MdFavoriteBorder, MdLoop, MdOutlineImage } from "react-icons/md";
 import { BiComment } from "react-icons/bi";
-import styled from "styled-components";
 import BlankPNG from "../../assets/blank-profile-picture.png";
 import Reply from "./Reply";
 
@@ -28,67 +27,91 @@ function Tweet({ children, retweeted, image, replies }: Props) {
 	return (
 		<div>
 			{retweeted && (
-				<ReTweet>
+				<div className="mb-2.5 flex items-center gap-2.5 text-sm text-ash">
 					<MdLoop />
 					<span>{retweeted} Retweeted</span>
-				</ReTweet>
+				</div>
 			)}
-			<Container replies={replies}>
-				<div onClick={() => setShowComments((prev) => !prev)}>
-					<Top>
-						<Picture>
-							<img src={BlankPNG} alt={"name" + ""} />
-						</Picture>
-						<div>
-							<div className="name">Micheal Stanley</div>
-							<div className="time">24 August at 20:30</div>
+			<div className="rounded-lg bg-white p-5 shadow-soft">
+				<div
+					className={`${replies ? "cursor-pointer" : "cursor-default"}`}
+					onClick={() => setShowComments((prev) => !prev)}
+				>
+					<div className="flex cursor-pointer gap-4">
+						<div className="h-10 w-10 overflow-hidden rounded-lg">
+							<img className="image-center" src={BlankPNG} alt={"name" + ""} />
 						</div>
-					</Top>
-					<Content>{children}</Content>
+						<div>
+							<div className="font-poppins font-medium text-black">Micheal Stanley</div>
+							<div className="text-xs text-[#bdbdbd]">24 August at 20:30</div>
+						</div>
+					</div>
+					<div className="mt-5">{children}</div>
 					{image && (
-						<ImageContainer>
-							<img src={image} alt="image" />
-						</ImageContainer>
+						<div className="mt-5 h-[350px] w-full overflow-hidden rounded-lg">
+							<img className="image-center" src={image} alt="image" />
+						</div>
 					)}
-					<Details>
+					<div className="mt-3.5 flex justify-end gap-4 text-xs font-medium text-[#bdbdbd]">
 						<div>24k likes</div>
 						<div>24k comments</div>
 						<div>24k retweets</div>
-					</Details>
+					</div>
 				</div>
-				<Actions isCommenting={showReplyBox} isRetweeted={isRetweeted} isLiked={isLiked} isSaved={isSaved}>
-					<div className="comment" onClick={() => setShowReplyBox((prev) => !prev)}>
+				<div className="mt-2 flex border-t border-t-offWhite py-1">
+					<div
+						className={`flex flex-1 cursor-pointer items-center justify-center gap-3 rounded-lg p-3 text-xl hover:bg-offWhite md:text-base ${
+							showReplyBox ? "bg-offWhite" : "bg-inherit"
+						}`}
+						onClick={() => setShowReplyBox((prev) => !prev)}
+					>
 						<BiComment />
 						<span>Comment</span>
 					</div>
-					<div className="retweet" onClick={() => setIsRetweeted((prev) => !prev)}>
+					<div
+						className={`flex flex-1 cursor-pointer items-center justify-center gap-3 rounded-lg p-3 text-xl hover:bg-offWhite md:text-base ${
+							isRetweeted ? "text-[#27ae60]" : "text-inherit"
+						}`}
+						onClick={() => setIsRetweeted((prev) => !prev)}
+					>
 						<MdLoop />
 						<span>Retweet{isRetweeted && "ed"}</span>
 					</div>
-					<div className="like" onClick={() => setIsLiked((prev) => !prev)}>
+					<div
+						className={`flex flex-1 cursor-pointer items-center justify-center gap-3 rounded-lg p-3 text-xl hover:bg-offWhite md:text-base ${
+							isLiked ? "text-[#eb5757]" : "text-inherit"
+						}`}
+						onClick={() => setIsLiked((prev) => !prev)}
+					>
 						<MdFavoriteBorder />
 						<span>Like{isLiked && "d"}</span>
 					</div>
-					<div className="save" onClick={() => setIsSaved((prev) => !prev)}>
+					<div
+						className={`flex flex-1 cursor-pointer items-center justify-center gap-3 rounded-lg p-3 text-xl hover:bg-offWhite md:text-base ${
+							isSaved ? "text-secondaryBlue" : "text-inherit"
+						}`}
+						onClick={() => setIsSaved((prev) => !prev)}
+					>
 						<MdBookmarkBorder />
 						<span>Save{isSaved && "d"}</span>
 					</div>
-				</Actions>
+				</div>
 				{showReplyBox && (
-					<MakeAReply onSubmit={onReplySubmit}>
-						<Picture>
-							<img src={BlankPNG} alt="picture" />
-						</Picture>
+					<form className="gap4 flex border-t border-t-offWhite p-2.5" onSubmit={onReplySubmit}>
+						<div className="h-10 w-10 overflow-hidden rounded-lg">
+							<img className="image-center" src={BlankPNG} alt="picture" />
+						</div>
 						<input
+							className="placeholder:[#bdbdbd] w-full rounded-lg border border-offWhite bg-[#fafafa] px-3 py-2.5 pr-[50px] text-sm font-medium text-[#4f4f4f] outline-none"
 							type="text"
 							placeholder="Tweet your reply"
 							value={enteredReply}
 							onChange={(e) => setEnteredReply(e.target.value)}
 						/>
-					</MakeAReply>
+					</form>
 				)}
 				{showComments && (
-					<RepliesContainer>
+					<div className="flex flex-col gap-[18px] border-t border-t-offWhite pt-5">
 						<Reply>
 							Lorem ipsum dolor sit, amet consectetur adipisicing elit. Illum aut pariatur ad voluptatem facere
 							doloribus fuga harum, exercitationem sequi a debitis magnam eius recusandae ullam in molestias quod
@@ -99,180 +122,11 @@ function Tweet({ children, retweeted, image, replies }: Props) {
 							doloribus fuga harum, exercitationem sequi a debitis magnam eius recusandae ullam in molestias quod
 							tenetur id.
 						</Reply>
-					</RepliesContainer>
+					</div>
 				)}
-			</Container>
+			</div>
 		</div>
 	);
 }
 
 export default Tweet;
-
-const RepliesContainer = styled.div`
-	border-top: 1px solid #f2f2f2;
-	padding-top: 2rem;
-	display: flex;
-	flex-direction: column;
-	gap: 1.8rem;
-`;
-
-const MakeAReply = styled.form`
-	padding: 1rem;
-	display: flex;
-	gap: 1.6rem;
-	border-top: 1px solid #f2f2f2;
-
-	input {
-		border-radius: 8px;
-		width: 100%;
-		outline: none;
-		border: 1px solid #f2f2f2;
-		background-color: #fafafa;
-		color: #4f4f4f;
-		font-size: 1.4rem;
-		padding: 1rem 1.2rem;
-		padding-right: 5rem;
-
-		&::placeholder {
-			color: #bdbdbd;
-			font-weight: 500;
-		}
-	}
-`;
-
-interface IActions {
-	isRetweeted?: boolean;
-	isLiked?: boolean;
-	isSaved?: boolean;
-	isCommenting: boolean;
-}
-
-const Actions = styled.div<IActions>`
-	display: flex;
-	margin-top: 0.8rem;
-	padding: 0.3rem 0;
-	border-top: 1px solid #f2f2f2;
-
-	.comment {
-		background-color: ${(props) => (props.isCommenting ? "#f2f2f2" : "inherit")};
-	}
-
-	.retweet {
-		color: ${(props) => (props.isRetweeted ? "#27ae60" : "inherit")};
-	}
-
-	.like {
-		color: ${(props) => (props.isLiked ? "#eb5757" : "inherit")};
-	}
-
-	.save {
-		color: ${(props) => (props.isSaved ? "#2d9cdb" : "inherit")};
-	}
-
-	& > div {
-		flex: 1;
-		display: flex;
-		justify-content: center;
-		align-items: center;
-		gap: 1.2rem;
-		padding: 1.2rem;
-		cursor: pointer;
-
-		&:hover {
-			background-color: #f2f2f2;
-			border-radius: 8px;
-		}
-
-		@media only screen and (max-width: 768px) {
-			font-size: 2rem;
-
-			span {
-				display: none;
-			}
-		}
-	}
-`;
-
-const Details = styled.div`
-	margin-top: 1.4rem;
-	display: flex;
-	justify-content: flex-end;
-	gap: 1.6rem;
-	font-size: 1.2rem;
-	font-weight: 500;
-	color: #bdbdbd;
-`;
-
-const ImageContainer = styled.div`
-	height: 35rem;
-	width: 100%;
-	overflow: hidden;
-	border-radius: 8px;
-	margin-top: 2rem;
-
-	img {
-		width: 100%;
-		height: 100%;
-		object-fit: cover;
-		object-position: center;
-	}
-`;
-
-const Content = styled.div`
-	margin-top: 2rem;
-`;
-
-const Picture = styled.div`
-	width: 4rem;
-	height: 4rem;
-	overflow: hidden;
-	border-radius: 8px;
-
-	img {
-		width: 100%;
-		height: 100%;
-		object-fit: cover;
-		object-position: center;
-	}
-`;
-
-const Top = styled.div`
-	display: flex;
-	gap: 1.7rem;
-	cursor: pointer;
-
-	.name {
-		font-family: "Poppins", sans-serif;
-		font-weight: 500;
-		color: black;
-	}
-
-	.time {
-		color: #bdbdbd;
-		font-size: 1.2rem;
-	}
-`;
-
-interface IContainer {
-	replies?: boolean;
-}
-
-const Container = styled.div<IContainer>`
-	background-color: #ffffff;
-	box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.05);
-	border-radius: 8px;
-	padding: 2rem;
-
-	& > div {
-		cursor: ${(props) => (props.replies ? "pointer" : "default")};
-	}
-`;
-
-const ReTweet = styled.div`
-	display: flex;
-	align-items: center;
-	color: #828282;
-	font-size: 1.4rem;
-	margin-bottom: 1rem;
-	gap: 1rem;
-`;

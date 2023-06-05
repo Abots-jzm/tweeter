@@ -1,5 +1,4 @@
 import React from "react";
-import styled, { keyframes } from "styled-components";
 import { useNavigate } from "react-router-dom";
 import BlankPNG from "../assets/blank-profile-picture.png";
 import { TbPhotoEdit } from "react-icons/tb";
@@ -71,29 +70,42 @@ function ProfileEdit({ isSetup }: Props) {
 	}
 
 	return (
-		<Container isSetup={!!isSetup}>
-			<div>
-				<Heading>Profile {isSetup ? "Setup" : "Edit"}</Heading>
-				<Cover>
-					<div>{(userProfile?.coverURL || watch("cover")?.[0]) && <img src={getCoverSrc()} alt="cover" />}</div>
-					<label htmlFor="cover">
-						<TbPhotoEdit />
-					</label>
-					<input type="file" id="cover" accept="image/*" {...register("cover")} />
-				</Cover>
-				<Picture>
-					<div>
-						<img src={getPhotoSrc()} alt="picture" />
+		<div className={`grid place-items-center bg-white sm:bg-offWhite ${isSetup ? "h-screen" : "h-full"}`}>
+			<div className="relative w-full max-w-[473px] rounded-xl bg-white p-5 px-[58px] shadow-none sm:py-[30px] sm:shadow-soft">
+				<div className="flex items-center justify-between text-2xl">Profile {isSetup ? "Setup" : "Edit"}</div>
+				<div className="relative mt-[30px] items-center">
+					<div className="h-[100px] w-full overflow-hidden rounded-lg bg-ash">
+						{(userProfile?.coverURL || watch("cover")?.[0]) && (
+							<img className="image-center" src={getCoverSrc()} alt="cover" />
+						)}
 					</div>
-					<label htmlFor="photo">
+					<label
+						className="absolute left-4 top-4 grid h-[30px] w-[30px] cursor-pointer place-items-center rounded-full bg-transparentBlack text-white"
+						htmlFor="cover"
+					>
 						<TbPhotoEdit />
 					</label>
-					<input type="file" id="photo" accept="image/*" {...register("photo")} />
-				</Picture>
-				<Form onSubmit={handleSubmit(onSave)} isSetup={!!isSetup}>
+					<input className="hidden" type="file" id="cover" accept="image/*" {...register("cover")} />
+				</div>
+				<div className="relative mt-[30px] items-center">
+					<div className="h-[60px] w-[60px] overflow-hidden rounded-lg">
+						<img className="image-center" src={getPhotoSrc()} alt="picture" />
+					</div>
+					<label
+						className="absolute left-4 top-4 grid h-[30px] w-[30px] cursor-pointer place-items-center rounded-full bg-transparentBlack text-white"
+						htmlFor="photo"
+					>
+						<TbPhotoEdit />
+					</label>
+					<input className="hidden" type="file" id="photo" accept="image/*" {...register("photo")} />
+				</div>
+				<form className="mt-6 flex flex-col gap-[18px]" onSubmit={handleSubmit(onSave)}>
 					<div>
-						<label htmlFor="displayName">Display Name</label>
+						<label className="mb-2 block" htmlFor="displayName">
+							Display Name
+						</label>
 						<input
+							className="w-full resize-none rounded-lg border border-ash p-2 placeholder:text-ash"
 							type="text"
 							id="dispayName"
 							placeholder="Enter display name"
@@ -105,210 +117,41 @@ function ProfileEdit({ isSetup }: Props) {
 								},
 							})}
 						/>
-						{errors.displayName && <ErrorMessage>This username already exist.</ErrorMessage>}
+						{errors.displayName && <p className="error-message">This username already exist.</p>}
 					</div>
 					<div>
-						<label htmlFor="bio">Bio</label>
-						<textarea id="bio" placeholder="Enter Bio" required {...register("bio")} />
+						<label className="mb-2 block" htmlFor="bio">
+							Bio
+						</label>
+						<textarea
+							className="h-[100px] w-full resize-none rounded-lg border border-ash p-2 placeholder:text-ash"
+							id="bio"
+							placeholder="Enter Bio"
+							required
+							{...register("bio")}
+						/>
 					</div>
-					<div className="buttons">
+					<div className={`flex items-center ${isSetup ? "justify-end" : "justify-between"}`}>
 						{!isSetup && (
-							<Back onClick={() => navigate(-1)}>
+							<div
+								className="flex cursor-pointer items-center gap-2 text-lg text-primaryBlue no-underline"
+								onClick={() => navigate(-1)}
+							>
 								<MdArrowBack /> Back
-							</Back>
+							</div>
 						)}
-						<button type="submit" disabled={!isDirty || !isValid}>
-							save {updatingProfile && <Spinner />}
+						<button
+							className="flex items-center justify-center gap-2 self-end rounded-lg bg-primaryBlue px-6 py-2 text-white"
+							type="submit"
+							disabled={!isDirty || !isValid}
+						>
+							save {updatingProfile && <div className="spinner" />}
 						</button>
 					</div>
-				</Form>
+				</form>
 			</div>
-		</Container>
+		</div>
 	);
 }
 
 export default ProfileEdit;
-
-const spinner = keyframes`
-   100% {
-    transform: rotate(360deg);
-  }
-`;
-
-const Spinner = styled.div`
-	width: 1.5rem;
-	height: 1.5rem;
-	border-radius: 50%;
-	border-left: 2px solid white;
-	animation: ${spinner} 0.7s linear infinite;
-`;
-
-const ErrorMessage = styled.div`
-	font-size: 1.4rem;
-	color: #ff414e;
-	margin-top: 1rem;
-	align-self: flex-start;
-`;
-
-const Back = styled.div`
-	color: #2f80ed;
-	font-size: 1.8rem;
-	display: flex;
-	align-items: center;
-	gap: 0.8rem;
-	cursor: pointer;
-	text-decoration: none;
-`;
-
-interface IForm {
-	isSetup: boolean;
-}
-
-const Form = styled.form<IForm>`
-	margin-top: 2.5rem;
-	display: flex;
-	flex-direction: column;
-	gap: 1.8rem;
-
-	.buttons {
-		display: flex;
-		align-items: center;
-		justify-content: ${(props) => (props.isSetup ? "flex-end" : "space-between")};
-		/* justify-content: space-between; */
-		/* justify-content: flex-end; */
-	}
-
-	label {
-		margin-bottom: 0.8rem;
-		display: block;
-	}
-
-	input,
-	textarea {
-		font: inherit;
-		padding: 0.8rem;
-		border-radius: 0.8rem;
-		border: 1px solid #828282;
-		width: 100%;
-		resize: none;
-
-		&::placeholder {
-			color: #828282;
-		}
-	}
-
-	textarea {
-		height: 10rem;
-	}
-
-	.display {
-		color: #828282;
-	}
-
-	button {
-		background: #2f80ed;
-		border-radius: 8px;
-		padding: 0.8rem 2.4rem;
-		color: white;
-		align-self: flex-end;
-		display: flex;
-		justify-content: center;
-		align-items: center;
-		gap: 0.8rem;
-	}
-`;
-
-const Picture = styled.div`
-	margin-top: 3rem;
-	align-items: center;
-	position: relative;
-
-	label {
-		position: absolute;
-		top: 1.5rem;
-		left: 1.5rem;
-		background-color: transparent;
-		color: white;
-		cursor: pointer;
-		background-color: rgba(0, 0, 0, 0.5);
-		width: 3rem;
-		height: 3rem;
-		display: grid;
-		border-radius: 100%;
-		place-items: center;
-	}
-
-	input {
-		display: none;
-	}
-
-	& > div {
-		height: 6rem;
-		width: 6rem;
-		border-radius: 1rem;
-		overflow: hidden;
-	}
-
-	img {
-		width: 100%;
-		height: 100%;
-		object-fit: cover;
-		object-position: center;
-	}
-`;
-
-const Cover = styled(Picture)`
-	& > div {
-		background-color: #828282;
-		height: 10rem;
-		width: 100%;
-		border-radius: 1rem;
-		overflow: hidden;
-	}
-`;
-
-const Heading = styled.div`
-	font-size: 2.4rem;
-	display: flex;
-	justify-content: space-between;
-	align-items: center;
-
-	div {
-		padding: 0.8rem 2.4rem;
-		border: 1px solid #828282;
-		color: #828282;
-		font-size: 1.6rem;
-		border-radius: 8px;
-		cursor: pointer;
-	}
-`;
-
-interface IContainer {
-	isSetup: boolean;
-}
-
-const Container = styled.div<IContainer>`
-	display: grid;
-	place-items: center;
-	height: ${(props) => (props.isSetup ? "100vh" : "100%")};
-	background-color: #f2f2f2;
-
-	& > div {
-		padding: 3rem 5.8rem;
-		border-radius: 1.2rem;
-		box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.05);
-		width: min(47.3rem, 100%);
-		position: relative;
-		background-color: white;
-	}
-
-	@media only screen and (max-width: 473px) {
-		place-items: start;
-		background-color: white;
-
-		& > div {
-			box-shadow: none;
-			padding: 2rem;
-		}
-	}
-`;

@@ -1,15 +1,14 @@
 import { FormEvent, useState } from "react";
+import { UseFormRegister } from "react-hook-form";
 import { FaGoogle } from "react-icons/fa";
 import { IoMdLock } from "react-icons/io";
 import { MdEmail } from "react-icons/md";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import styled, { keyframes } from "styled-components";
-import { Paths } from "../../routes";
 import LogoSVG from "../../assets/tweeter.svg";
-import useGuestLogin from "../../hooks/auth/useGuestLogin";
-import useGoogleLogin from "../../hooks/auth/useGoogleLogin";
 import { EmailAndPassword } from "../../hooks/auth/types";
-import { UseFormRegister } from "react-hook-form";
+import useGoogleLogin from "../../hooks/auth/useGoogleLogin";
+import useGuestLogin from "../../hooks/auth/useGuestLogin";
+import { Paths } from "../../routes";
 
 type Props = {
 	register: UseFormRegister<EmailAndPassword>;
@@ -60,210 +59,88 @@ function Layout({ register, errorMessage, errorMessageIsShown, isLoading, nextPa
 	}
 
 	return (
-		<Container>
-			<div>
-				<LogoContainer>
-					<img src={LogoSVG} alt="tweeter logo" />
-				</LogoContainer>
-				<SignupText>{isLoginPage ? "Login" : "Sign up"}</SignupText>
-				<Form onSubmit={handleSubmit}>
-					<div>
-						<p>
+		<div className="grid h-screen w-screen place-items-center items-start bg-inherit pt-[5vh] sm:items-center sm:bg-offWhite sm:pt-0">
+			<div className="w-full max-w-[473px] rounded-lg bg-white px-[58px] pt-5 sm:pb-12 sm:pt-12 sm:shadow-soft">
+				<div className="mb-10 h-[30px]">
+					<img className="h-full w-full object-contain object-left" src={LogoSVG} alt="tweeter logo" />
+				</div>
+				<div className="font-poppins text-lg font-semibold">{isLoginPage ? "Login" : "Sign up"}</div>
+				<form className="mt-[25px] flex flex-col gap-[18px]" onSubmit={handleSubmit}>
+					<div className="relative">
+						<p className="absolute left-[14px] top-[9px] text-[20px] text-ash">
 							<MdEmail />
 						</p>
-						<input {...register("email")} type="email" id="email" placeholder="Email" required />
+						<input
+							className="w-full rounded-lg border-none bg-offWhite2 p-2 pl-[46px] placeholder:text-ash"
+							{...register("email")}
+							type="email"
+							id="email"
+							placeholder="Email"
+							required
+						/>
 					</div>
-					<div>
-						<p>
+					<div className="relative">
+						<p className="absolute left-[14px] top-[9px] text-[20px] text-ash">
 							<IoMdLock />
 						</p>
-						<input {...register("password")} type="password" id="password" placeholder="Password" required />
+						<input
+							className="w-full rounded-lg border-none bg-offWhite2 p-2 pl-[46px] placeholder:text-ash"
+							{...register("password")}
+							type="password"
+							id="password"
+							placeholder="Password"
+							required
+						/>
 					</div>
-					<LoginBtn type="submit">
+					<button className="login-btn" type="submit">
 						<div>{isLoginPage ? "Login" : "Sign up"}</div>
-						{isLoading && <Spinner />}
-					</LoginBtn>
-				</Form>
-				{errorMessageIsShown && <ErrorMessage>{errorMessage}</ErrorMessage>}
-				<Others>
+						{isLoading && <div className="spinner" />}
+					</button>
+				</form>
+				{errorMessageIsShown && <div className="error-message">{errorMessage}</div>}
+				<div className="mt-[18px] flex flex-col items-center text-sm text-ash">
 					<div>or</div>
-					<OtherBtn onClick={onGoogleSubmit}>
-						<div className="icon">
+					<button
+						className="login-btn relative mt-[18px] w-full border border-ash bg-transparent font-normal text-ash"
+						onClick={onGoogleSubmit}
+					>
+						<div className="absolute left-5 top-[10px]">
 							<FaGoogle />
 						</div>
 						<span>continue with Google</span>
-						{googleIsLoading && <SpinnerGray />}
-					</OtherBtn>
-					{googleIsError && <ErrorMessage>{googleErrorMessage}</ErrorMessage>}
-					<OtherBtn onClick={onGuestSubmit}>
+						{googleIsLoading && <div className="spinner border-ash" />}
+					</button>
+					{googleIsError && <div className="error-message">{googleErrorMessage}</div>}
+					<button
+						className="login-btn relative mt-[18px] w-full border border-ash bg-transparent font-normal text-ash"
+						onClick={onGuestSubmit}
+					>
 						<span>continue as a guest</span>
-						{guestIsLoading && <SpinnerGray />}
-					</OtherBtn>
-					{guestIsError && <ErrorMessage>{guestErrorMessage}</ErrorMessage>}
-					<div className="other-text">
+						{guestIsLoading && <div className="spinner border-ash" />}
+					</button>
+					{guestIsError && <div className="error-message">{guestErrorMessage}</div>}
+					<div className="mt-[33px]">
 						{isLoginPage && (
 							<>
-								Don't have an account yet? <LinkStyles to={Paths.auth.signup}>Register</LinkStyles>
+								Don't have an account yet?{" "}
+								<Link className="text-secondaryBlue no-underline" to={Paths.auth.signup}>
+									Register
+								</Link>
 							</>
 						)}
 						{!isLoginPage && (
 							<>
-								Already have an account? <LinkStyles to={Paths.auth.login}>Login</LinkStyles>
+								Already have an account?{" "}
+								<Link className="text-secondaryBlue no-underline" to={Paths.auth.login}>
+									Login
+								</Link>
 							</>
 						)}
 					</div>
-				</Others>
+				</div>
 			</div>
-		</Container>
+		</div>
 	);
 }
 
 export default Layout;
-
-const LogoContainer = styled.div`
-	height: 3rem;
-	margin-bottom: 4rem;
-
-	img {
-		height: 100%;
-		width: 100%;
-		object-fit: contain;
-		object-position: left;
-	}
-`;
-
-const spinner = keyframes`
-   100% {
-    transform: rotate(360deg);
-  }
-`;
-
-const Spinner = styled.div`
-	width: 2rem;
-	height: 2rem;
-	border-radius: 50%;
-	border-left: 2px solid white;
-	animation: ${spinner} 0.7s linear infinite;
-`;
-
-const SpinnerGray = styled(Spinner)`
-	border-left: 1px solid #828282;
-`;
-
-const ErrorMessage = styled.div`
-	font-size: 1.4rem;
-	color: #ff414e;
-	margin-top: 1rem;
-	align-self: flex-start;
-`;
-
-const LinkStyles = styled(Link)`
-	color: #2d9cdb;
-	text-decoration: none;
-`;
-
-const Others = styled.div`
-	margin-top: 1.8rem;
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	color: #828282;
-	font-size: 1.4rem;
-
-	.other-text {
-		margin-top: 3.3rem;
-	}
-`;
-
-const LoginBtn = styled.button`
-	padding: 0.8rem;
-	background-color: #2f80ed;
-	color: white;
-	border-radius: 8px;
-	font-weight: 700;
-	display: flex;
-	justify-content: center;
-	align-items: center;
-	gap: 2rem;
-`;
-
-const OtherBtn = styled(LoginBtn)`
-	margin-top: 1.8rem;
-	border: 1px solid #828282;
-	color: #828282;
-	background-color: transparent;
-	width: 100%;
-	font-weight: 400;
-	position: relative;
-
-	.icon {
-		position: absolute;
-		left: 2rem;
-		top: 1rem;
-	}
-`;
-
-const Form = styled.form`
-	margin-top: 2.5rem;
-	display: flex;
-	flex-direction: column;
-	gap: 1.8rem;
-
-	& > div {
-		position: relative;
-	}
-
-	p {
-		position: absolute;
-		font-size: 2rem;
-		top: 0.9rem;
-		left: 1.4rem;
-		color: #828282;
-	}
-
-	input {
-		padding: 0.8rem;
-		border-radius: 0.8rem;
-		border: none;
-		padding-left: 4.6rem;
-		width: 100%;
-		background-color: #f3f3f3;
-
-		&::placeholder {
-			color: #828282;
-		}
-	}
-`;
-
-const SignupText = styled.div`
-	font-family: "Poppins", sans-serif;
-	font-size: 1.8rem;
-	font-weight: 600;
-`;
-
-const Container = styled.div`
-	display: grid;
-	place-items: center;
-	width: 100vw;
-	height: 100vh;
-	background-color: #f2f2f2;
-
-	& > div {
-		padding: 4.8rem 5.8rem;
-		border-radius: 0.8rem;
-		box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.05);
-		width: min(47.3rem, 100%);
-		background-color: white;
-	}
-
-	@media only screen and (max-width: 473px) {
-		place-items: start;
-		padding-top: 5vh;
-		background-color: inherit;
-
-		& > div {
-			box-shadow: none;
-			padding: 2rem;
-		}
-	}
-`;
