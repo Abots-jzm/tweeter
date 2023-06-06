@@ -1,8 +1,15 @@
-import React, { FormEvent, useRef, useState } from "react";
+import React, { useRef, useState } from "react";
 import BlankPNG from "../../assets/blank-profile-picture.png";
 import { MdClose, MdOutlineImage, MdPeople, MdPublic } from "react-icons/md";
 import ReplyModal from "./ReplyModal";
 import { useForm } from "react-hook-form";
+import useGetUserProfile from "../../hooks/profile/useGetUserProfile";
+import { useAppDispatch, useAppSelector } from "../../store/hooks";
+import useTweet from "../../hooks/tweet/useTweet";
+import { authActions } from "../../store/slices/authSlice";
+import { Timestamp } from "firebase/firestore";
+
+const TWEET_CHARACTER_LIMIT = 280;
 
 type Props = {
 	replyModalOpen: boolean;
@@ -10,20 +17,48 @@ type Props = {
 };
 
 type FormValues = {
-	tweet: string;
+	content: string;
 	image?: FileList;
 };
 
-type TweetAccessibility = "everyone" | "people you follow";
-
 function TweetSomething({ replyModalOpen, setReplyModalOpen }: Props) {
-	const [replyType, setReplyType] = useState<TweetAccessibility>("everyone");
-	const textAreaRef = useRef<HTMLTextAreaElement>(null);
+	const [isPublicReply, setIsPublicReply] = useState(true);
+	const textAreaRef = useRef<HTMLTextAreaElement | null>(null);
 
-	const { register, handleSubmit, watch, resetField } = useForm<FormValues>();
+	const { register, handleSubmit, watch, resetField, reset } = useForm<FormValues>();
+	const { ref, ...rest } = register("content", { maxLength: TWEET_CHARACTER_LIMIT });
 	const currentImage = watch("image")?.[0];
 
-	function onTweetSubmit() {}
+	const uid = useAppSelector((state) => state.auth.uid);
+	const dispatch = useAppDispatch();
+
+	const { data: userProfile } = useGetUserProfile(uid);
+	const { mutate: tweet, isLoading: isTweeting } = useTweet();
+
+	function onTweetSubmit({ content, image }: FormValues) {
+		if (!uid) {
+			dispatch(authActions.logout());
+			return;
+		}
+
+		if (!userProfile) return;
+
+		tweet(
+			{
+				uid,
+				content,
+				isPublicReply,
+				time: Timestamp.now(),
+				user: userProfile,
+				image: image?.[0],
+			},
+			{
+				onSuccess() {
+					reset();
+				},
+			}
+		);
+	}
 
 	function AdjustTextAreaHeight() {
 		if (!textAreaRef.current) return;
@@ -36,13 +71,8 @@ function TweetSomething({ replyModalOpen, setReplyModalOpen }: Props) {
 		setReplyModalOpen((prev) => !prev);
 	}
 
-	function setToEveryone() {
-		setReplyType("everyone");
-		setReplyModalOpen(false);
-	}
-
-	function setToFollow() {
-		setReplyType("people you follow");
+	function changeIsPublicReply(isPublicReply: boolean) {
+		setIsPublicReply(isPublicReply);
 		setReplyModalOpen(false);
 	}
 
@@ -53,17 +83,25 @@ function TweetSomething({ replyModalOpen, setReplyModalOpen }: Props) {
 			</div>
 			<form className="flex gap-3" onSubmit={handleSubmit(onTweetSubmit)}>
 				<div className="h-10 w-10 overflow-hidden rounded-lg">
-					<img className="centered-image" src={BlankPNG} alt={"name" + " picture"} />
+					<img
+						className="image-center"
+						src={userProfile?.photoURL || BlankPNG}
+						alt={userProfile?.displayName + " picture"}
+					/>
 				</div>
 				<div className="flex-1">
 					<div>
 						<textarea
 							className="mt-2.5 h-[50px] w-full resize-none border-none font-medium text-[#4f4f4f] outline-none placeholder:text-[#bdbdbd]"
-							{...register("tweet")}
-							ref={textAreaRef}
-							id="tweet"
+							{...rest}
+							ref={(e) => {
+								ref(e);
+								textAreaRef.current = e;
+							}}
+							id="content"
 							placeholder="What's happening?"
 							onInput={AdjustTextAreaHeight}
+							required
 						/>
 					</div>
 					{currentImage && (
@@ -83,28 +121,30 @@ function TweetSomething({ replyModalOpen, setReplyModalOpen }: Props) {
 						</label>
 						<input className="hidden" type="file" id="image" {...register("image")} />
 						<div className="relative flex cursor-pointer items-center gap-2" onClick={toggleReplyModal}>
-							{replyType === "everyone" && (
+							{isPublicReply && (
 								<>
 									<MdPublic />
 									<span className="text-xs font-medium">Everyone can reply</span>
 								</>
 							)}
-							{replyType === "people you follow" && (
+							{!isPublicReply && (
 								<>
 									<MdPeople />
 									<span className="text-xs font-medium">People you follow</span>
 								</>
 							)}
 							{replyModalOpen && (
-								<ReplyModal
-									setToEveryone={setToEveryone}
-									setToFollow={setToFollow}
-									onClick={(e) => e.stopPropagation()}
-								/>
+								<ReplyModal onClick={(e) => e.stopPropagation()} changeIsPublicReply={changeIsPublicReply} />
 							)}
 						</div>
-						<button className="ml-auto rounded bg-primaryBlue px-6 py-2 text-white" type="submit">
+						{watch("content") && (
+							<div className="text-xs text-ash">
+								{watch("content").length}/{TWEET_CHARACTER_LIMIT}
+							</div>
+						)}
+						<button className="ml-auto flex gap-2 rounded bg-primaryBlue px-6 py-2 text-white" type="submit">
 							Tweet
+							{isTweeting && <div className="spinner" />}
 						</button>
 					</div>
 				</div>

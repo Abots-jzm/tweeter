@@ -4,6 +4,10 @@ export type UpdateProfilePayload = {
 	displayName: string;
 	bio: string;
 	uid: string;
+	tweetIndex: number;
+	imageIndex: number;
+	followers: string[];
+	following: string[];
 };
 
 export type UserData = {
@@ -11,4 +15,8 @@ export type UserData = {
 	bio: string;
 	photoURL?: string;
 	coverURL?: string;
+	tweetIndex: number;
+	imageIndex: number;
+	followers: string[];
+	following: string[];
 };

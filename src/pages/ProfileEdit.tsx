@@ -59,7 +59,17 @@ function ProfileEdit({ isSetup }: Props) {
 		}
 
 		updateProfile(
-			{ bio, displayName, uid, cover: cover?.[0], photo: photo?.[0] },
+			{
+				bio,
+				displayName,
+				uid,
+				cover: cover?.[0],
+				photo: photo?.[0],
+				followers: userProfile?.followers || [],
+				following: userProfile?.following || [],
+				imageIndex: userProfile?.imageIndex || 0,
+				tweetIndex: userProfile?.tweetIndex || 0,
+			},
 			{
 				onSuccess() {
 					if (isSetup) navigate(Paths.home, { replace: true });

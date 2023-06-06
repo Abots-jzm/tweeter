@@ -66,7 +66,7 @@ function Tweet({ children, retweeted, image, replies }: Props) {
 						onClick={() => setShowReplyBox((prev) => !prev)}
 					>
 						<BiComment />
-						<span>Comment</span>
+						<span className="hidden md:inline">Comment</span>
 					</div>
 					<div
 						className={`flex flex-1 cursor-pointer items-center justify-center gap-3 rounded-lg p-3 text-xl hover:bg-offWhite md:text-base ${
@@ -75,7 +75,7 @@ function Tweet({ children, retweeted, image, replies }: Props) {
 						onClick={() => setIsRetweeted((prev) => !prev)}
 					>
 						<MdLoop />
-						<span>Retweet{isRetweeted && "ed"}</span>
+						<span className="hidden md:inline">Retweet{isRetweeted && "ed"}</span>
 					</div>
 					<div
 						className={`flex flex-1 cursor-pointer items-center justify-center gap-3 rounded-lg p-3 text-xl hover:bg-offWhite md:text-base ${
@@ -84,7 +84,7 @@ function Tweet({ children, retweeted, image, replies }: Props) {
 						onClick={() => setIsLiked((prev) => !prev)}
 					>
 						<MdFavoriteBorder />
-						<span>Like{isLiked && "d"}</span>
+						<span className="hidden md:inline">Like{isLiked && "d"}</span>
 					</div>
 					<div
 						className={`flex flex-1 cursor-pointer items-center justify-center gap-3 rounded-lg p-3 text-xl hover:bg-offWhite md:text-base ${
@@ -93,7 +93,7 @@ function Tweet({ children, retweeted, image, replies }: Props) {
 						onClick={() => setIsSaved((prev) => !prev)}
 					>
 						<MdBookmarkBorder />
-						<span>Save{isSaved && "d"}</span>
+						<span className="hidden md:inline">Save{isSaved && "d"}</span>
 					</div>
 				</div>
 				{showReplyBox && (
