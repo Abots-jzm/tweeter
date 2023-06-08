@@ -17,24 +17,50 @@ export type Tweet = {
 	photoUrl: string;
 	time: Timestamp;
 	content: string;
-	tweetIndex: number;
 	imageUrl?: string;
-	imageIndex?: number;
 	followers: string[];
 	following: string[];
 	likes: string[];
-	retweets: string[];
+	retweets: RetweetType[];
 	bookmarks: string[];
 	replies: Reply[];
-	retweeted: boolean;
 	isPublicReply: boolean;
+};
+
+export type RetweetType = {
+	name: string;
+	uid: string;
 };
 
 export type Reply = {
 	displayName: string;
 	uid: string;
 	time: Timestamp;
-	photoUrl: string;
+	photoUrl?: string;
 	content: string;
 	likes: string[];
+};
+
+export type LikePayload = {
+	tweetId: string;
+	userId: string;
+	action: "like" | "unlike";
+};
+
+export type BookmarkPayload = {
+	tweetId: string;
+	userId: string;
+	action: "save" | "unsave";
+};
+
+export type RetweetPayload = {
+	tweetId: string;
+	userId: string;
+	userDisplayName: string;
+	action: "retweet" | "unretweet";
+};
+
+export type ReplyPayload = {
+	tweetId: string;
+	reply: Reply;
 };

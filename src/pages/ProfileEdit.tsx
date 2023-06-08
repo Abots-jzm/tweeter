@@ -69,6 +69,7 @@ function ProfileEdit({ isSetup }: Props) {
 				following: userProfile?.following || [],
 				imageIndex: userProfile?.imageIndex || 0,
 				tweetIndex: userProfile?.tweetIndex || 0,
+				previousDisplayName: userProfile?.displayName,
 			},
 			{
 				onSuccess() {

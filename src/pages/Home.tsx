@@ -2,9 +2,22 @@ import React, { useState } from "react";
 import TweetSomething from "../components/tweets/TweetSomething";
 import Tweet from "../components/tweets/Tweet";
 import Person from "../components/tweets/Person";
+import useGetHomeTweets from "../hooks/tweet/useGetHomeTweets";
+import { useAppSelector } from "../store/hooks";
+import useGetUserProfile from "../hooks/profile/useGetUserProfile";
 
 function Home() {
 	const [replyModalOpen, setReplyModalOpen] = useState(false);
+	const userId = useAppSelector((state) => state.auth.uid);
+	const { data: userProfile } = useGetUserProfile(userId);
+	const { data: homeTweets, isLoading } = useGetHomeTweets(userId, userProfile?.following);
+
+	if (isLoading)
+		return (
+			<div className="mt-32 grid place-items-center">
+				<div className="spinner h-40 w-40 border-l-primaryBlue" />
+			</div>
+		);
 
 	return (
 		<div className="mx-auto my-0 flex max-w-[1100px] gap-6 px-5 py-6">
@@ -15,14 +28,22 @@ function Home() {
 					<Person truncate />
 				</div>
 				<div className="my-6 flex flex-col gap-6">
-					<Tweet
-						retweeted="Daniel Johnson"
-						image="https://images.immediate.co.uk/production/volatile/sites/30/2022/07/Black-beans-avocado-on-toast-d351aa6.jpg?quality=90&webp=true&fit=700,350"
-						replies
-					>
-						Lorem ipsum dolor sit amet consectetur adipisicing elit. Eum omnis odit cupiditate molestiae ad hic
-						consequatur eius quo dolor minus. In deserunt sunt architecto doloremque eius, fugiat recusandae ipsam eos.
-					</Tweet>
+					{homeTweets?.map((tweet) => (
+						<Tweet
+							key={tweet.id}
+							id={tweet.id}
+							image={tweet.imageUrl}
+							displayName={tweet.displayName}
+							time={tweet.time}
+							photo={tweet.photoUrl}
+							likes={tweet.likes}
+							retweets={tweet.retweets}
+							replies={tweet.replies}
+							userTweetId={tweet.uid}
+						>
+							{tweet.content}
+						</Tweet>
+					))}
 				</div>
 			</div>
 			<div className="hidden basis-[306px] self-start rounded-xl bg-white px-5 py-3.5 shadow-soft lg:block">

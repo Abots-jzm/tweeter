@@ -22,22 +22,20 @@ async function tweet(payload: TweetPayload) {
 		time: Timestamp.now(),
 		photoUrl: payload.user.photoURL || "",
 		content: payload.content,
-		tweetIndex: payload.user.tweetIndex,
 		followers: payload.user.followers,
 		following: payload.user.following,
 		likes: [],
 		retweets: [],
 		bookmarks: [],
 		replies: [],
-		retweeted: false,
 		isPublicReply: payload.isPublicReply,
 	};
 	if (imageUrl) tweetData.imageUrl = imageUrl;
 
 	const batch = writeBatch(db);
 	batch.set(doc(db, "tweets/" + id), tweetData);
-	batch.update(doc(db, "users/" + payload.uid), { tweetIndex: payload.user.tweetIndex + 1 });
-	if (imageUrl) batch.update(doc(db, "users/" + payload.uid), { imageIndex: payload.user.imageIndex + 1 });
+	batch.update(doc(db, "users/" + payload.uid), { tweetIndex: Number(payload.user.tweetIndex) + 1 });
+	if (imageUrl) batch.update(doc(db, "users/" + payload.uid), { imageIndex: Number(payload.user.imageIndex) + 1 });
 
 	await batch.commit();
 }
@@ -47,7 +45,7 @@ function useTweet() {
 
 	return useMutation(tweet, {
 		onSuccess() {
-			queryClient.invalidateQueries([QueryKeys.myTweets]);
+			queryClient.invalidateQueries([QueryKeys.homeTweets]);
 		},
 	});
 }

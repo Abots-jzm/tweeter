@@ -1,28 +1,149 @@
-import React, { useState } from "react";
-import { MdBookmarkBorder, MdFavoriteBorder, MdLoop, MdOutlineImage } from "react-icons/md";
+import React, { useEffect, useRef, useState } from "react";
+import { MdBookmarkBorder, MdFavoriteBorder, MdLoop } from "react-icons/md";
 import { BiComment } from "react-icons/bi";
 import BlankPNG from "../../assets/blank-profile-picture.png";
+import { Timestamp } from "firebase/firestore";
+import { Reply as ReplyType, RetweetType } from "../../hooks/tweet/types";
+import { Link } from "react-router-dom";
+import { Paths } from "../../routes";
+import useLike from "../../hooks/tweet/useLike";
+import { useAppDispatch, useAppSelector } from "../../store/hooks";
+import useBookmark from "../../hooks/tweet/useBookmark";
+import { authActions } from "../../store/slices/authSlice";
+import useRetweet from "../../hooks/tweet/useRetweet";
+import useGetUserProfile from "../../hooks/profile/useGetUserProfile";
+import useReply from "../../hooks/tweet/useReply";
 import Reply from "./Reply";
 
 type Props = {
 	children: React.ReactNode;
 	retweeted?: string;
 	image?: string;
-	replies?: boolean;
+	photo?: string;
+	id: string;
+	displayName: string;
+	time: Timestamp;
+	likes: string[];
+	retweets: RetweetType[];
+	replies: ReplyType[];
+	userTweetId: string;
 };
 
-function Tweet({ children, retweeted, image, replies }: Props) {
+function Tweet({
+	children,
+	retweeted,
+	image,
+	replies,
+	photo,
+	displayName,
+	time,
+	likes,
+	retweets,
+	userTweetId,
+	id,
+}: Props) {
+	const userId = useAppSelector((state) => state.auth.uid);
+	const dispatch = useAppDispatch();
+
+	const commentsRef = useRef<HTMLDivElement>(null);
 	const [enteredReply, setEnteredReply] = useState("");
 	const [showReplyBox, setShowReplyBox] = useState(false);
 	const [showComments, setShowComments] = useState(false);
-	const [isRetweeted, setIsRetweeted] = useState(false);
-	const [isLiked, setIsLiked] = useState(false);
+	const [displayedReplies, setDisplayedReplies] = useState(replies);
+	const [isRetweeted, setIsRetweeted] = useState(
+		userId ? retweets.some((retweetData) => retweetData.uid === userId) : false
+	);
+	const [noOfRetweets, setNoOfRetweets] = useState(retweets.length);
+	const [isLiked, setIsLiked] = useState(userId ? likes.includes(userId) : false);
+	const [noOfLikes, setNoOfLikes] = useState(likes.length);
 	const [isSaved, setIsSaved] = useState(false);
+
+	const { data: userProfile } = useGetUserProfile(userId);
+	const { mutate: like } = useLike();
+	const { mutate: bookmark } = useBookmark();
+	const { mutate: retweet } = useRetweet();
+	const { mutate: reply } = useReply();
 
 	function onReplySubmit(e: React.FormEvent<HTMLFormElement>) {
 		e.preventDefault();
-		console.log(enteredReply);
+		if (!userProfile || !userId) return;
+
+		const newReply = {
+			content: enteredReply,
+			displayName: userProfile.displayName,
+			likes: [],
+			photoUrl: userProfile.photoURL,
+			time: Timestamp.now(),
+			uid: userId,
+		};
+
+		reply({ tweetId: id, reply: newReply });
+		setDisplayedReplies((prev) => [newReply, ...prev]);
+		setShowComments(true);
+		setEnteredReply("");
 	}
+
+	function onLikeBtnClicked() {
+		if (!userId) {
+			dispatch(authActions.logout());
+			return;
+		}
+
+		like({ action: isLiked ? "unlike" : "like", tweetId: id, userId });
+		setIsLiked((prev) => !prev);
+		setNoOfLikes((prev) => (isLiked ? prev - 1 : prev + 1));
+	}
+
+	function onRetweetBtnClicked() {
+		if (!userId) {
+			dispatch(authActions.logout());
+			return;
+		}
+
+		if (!userProfile) return;
+
+		retweet({
+			action: isRetweeted ? "unretweet" : "retweet",
+			tweetId: id,
+			userId,
+			userDisplayName: userProfile.displayName,
+		});
+		setIsRetweeted((prev) => !prev);
+		setNoOfRetweets((prev) => (isRetweeted ? prev - 1 : prev + 1));
+	}
+
+	function onSaveBtnClicked() {
+		if (!userId) {
+			dispatch(authActions.logout());
+			return;
+		}
+
+		bookmark({ action: isSaved ? "unsave" : "save", tweetId: id, userId });
+		setIsSaved((prev) => !prev);
+	}
+
+	function formatTime(timestamp: Timestamp) {
+		const date = new Date(timestamp.toDate());
+
+		const formattedDate = date.toLocaleString("en-US", {
+			day: "numeric",
+			month: "long",
+			hour: "numeric",
+			minute: "2-digit",
+		});
+
+		return formattedDate;
+	}
+
+	function onTweetCicked() {
+		setShowComments((prev) => !prev);
+	}
+
+	useEffect(() => {
+		if (showComments === false) return;
+
+		commentsRef.current?.scrollIntoView({ behavior: "smooth" });
+	}, [showComments]);
 
 	return (
 		<div>
@@ -33,29 +154,43 @@ function Tweet({ children, retweeted, image, replies }: Props) {
 				</div>
 			)}
 			<div className="rounded-lg bg-white p-5 shadow-soft">
-				<div
-					className={`${replies ? "cursor-pointer" : "cursor-default"}`}
-					onClick={() => setShowComments((prev) => !prev)}
-				>
-					<div className="flex cursor-pointer gap-4">
+				<div className={`${displayedReplies.length > 0 ? "cursor-pointer" : "cursor-default"}`} onClick={onTweetCicked}>
+					<div className="flex gap-4">
 						<div className="h-10 w-10 overflow-hidden rounded-lg">
-							<img className="image-center" src={BlankPNG} alt={"name" + ""} />
+							<img className="image-center" src={photo || BlankPNG} alt={"name" + ""} />
 						</div>
 						<div>
-							<div className="font-poppins font-medium text-black">Micheal Stanley</div>
-							<div className="text-xs text-[#bdbdbd]">24 August at 20:30</div>
+							<Link
+								to={`${Paths.profile}/${userTweetId}`}
+								className="cursor-pointer font-poppins font-medium text-black "
+							>
+								{displayName}
+							</Link>
+							<div className="text-xs text-[#bdbdbd]">{formatTime(time)}</div>
 						</div>
 					</div>
-					<div className="mt-5">{children}</div>
+					<div className="mt-5 whitespace-pre-line">{children}</div>
 					{image && (
-						<div className="mt-5 h-[350px] w-full overflow-hidden rounded-lg">
+						<div className="mt-5 h-auto w-full overflow-hidden rounded-lg">
 							<img className="image-center" src={image} alt="image" />
 						</div>
 					)}
 					<div className="mt-3.5 flex justify-end gap-4 text-xs font-medium text-[#bdbdbd]">
-						<div>24k likes</div>
-						<div>24k comments</div>
-						<div>24k retweets</div>
+						{noOfLikes > 0 && (
+							<div>
+								{noOfLikes} like{noOfLikes > 1 && "s"}
+							</div>
+						)}
+						{replies.length > 0 && (
+							<div>
+								{replies.length} comment{replies.length > 1 && "s"}
+							</div>
+						)}
+						{noOfRetweets > 0 && (
+							<div>
+								{noOfRetweets} retweet{noOfRetweets > 1 && "s"}
+							</div>
+						)}
 					</div>
 				</div>
 				<div className="mt-2 flex border-t border-t-offWhite py-1">
@@ -72,7 +207,7 @@ function Tweet({ children, retweeted, image, replies }: Props) {
 						className={`flex flex-1 cursor-pointer items-center justify-center gap-3 rounded-lg p-3 text-xl hover:bg-offWhite md:text-base ${
 							isRetweeted ? "text-[#27ae60]" : "text-inherit"
 						}`}
-						onClick={() => setIsRetweeted((prev) => !prev)}
+						onClick={onRetweetBtnClicked}
 					>
 						<MdLoop />
 						<span className="hidden md:inline">Retweet{isRetweeted && "ed"}</span>
@@ -81,7 +216,7 @@ function Tweet({ children, retweeted, image, replies }: Props) {
 						className={`flex flex-1 cursor-pointer items-center justify-center gap-3 rounded-lg p-3 text-xl hover:bg-offWhite md:text-base ${
 							isLiked ? "text-[#eb5757]" : "text-inherit"
 						}`}
-						onClick={() => setIsLiked((prev) => !prev)}
+						onClick={onLikeBtnClicked}
 					>
 						<MdFavoriteBorder />
 						<span className="hidden md:inline">Like{isLiked && "d"}</span>
@@ -90,7 +225,7 @@ function Tweet({ children, retweeted, image, replies }: Props) {
 						className={`flex flex-1 cursor-pointer items-center justify-center gap-3 rounded-lg p-3 text-xl hover:bg-offWhite md:text-base ${
 							isSaved ? "text-secondaryBlue" : "text-inherit"
 						}`}
-						onClick={() => setIsSaved((prev) => !prev)}
+						onClick={onSaveBtnClicked}
 					>
 						<MdBookmarkBorder />
 						<span className="hidden md:inline">Save{isSaved && "d"}</span>
@@ -110,18 +245,18 @@ function Tweet({ children, retweeted, image, replies }: Props) {
 						/>
 					</form>
 				)}
-				{showComments && (
-					<div className="flex flex-col gap-[18px] border-t border-t-offWhite pt-5">
-						<Reply>
-							Lorem ipsum dolor sit, amet consectetur adipisicing elit. Illum aut pariatur ad voluptatem facere
-							doloribus fuga harum, exercitationem sequi a debitis magnam eius recusandae ullam in molestias quod
-							tenetur id.
-						</Reply>
-						<Reply>
-							Lorem ipsum dolor sit, amet consectetur adipisicing elit. Illum aut pariatur ad voluptatem facere
-							doloribus fuga harum, exercitationem sequi a debitis magnam eius recusandae ullam in molestias quod
-							tenetur id.
-						</Reply>
+				{showComments && displayedReplies.length > 0 && (
+					<div className="flex flex-col gap-[18px] border-t border-t-offWhite pt-5" ref={commentsRef}>
+						{displayedReplies.map((reply) => (
+							<Reply
+								key={reply.time.toString()}
+								photo={reply.photoUrl}
+								name={reply.displayName}
+								time={formatTime(reply.time)}
+							>
+								{reply.content}
+							</Reply>
+						))}
 					</div>
 				)}
 			</div>

@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { db, storage } from "../../api/firebase";
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
-import { arrayUnion, doc, writeBatch } from "firebase/firestore";
+import { arrayRemove, arrayUnion, doc, writeBatch } from "firebase/firestore";
 import { UpdateProfilePayload, UserData } from "./types";
 import { QueryKeys } from "../data";
 import { useAppSelector } from "../../store/hooks";
@@ -35,6 +35,8 @@ async function updateProfile(payload: UpdateProfilePayload) {
 
 	const batch = writeBatch(db);
 	batch.update(doc(db, "default/info"), { allNames: arrayUnion(user.displayName) });
+	payload.previousDisplayName &&
+		batch.update(doc(db, "default/info"), { allNames: arrayRemove(payload.previousDisplayName) });
 	batch.set(doc(db, "users/" + payload.uid), user, { merge: true });
 
 	return await batch.commit();

@@ -8,6 +8,7 @@ export type UpdateProfilePayload = {
 	imageIndex: number;
 	followers: string[];
 	following: string[];
+	previousDisplayName?: string;
 };
 
 export type UserData = {
