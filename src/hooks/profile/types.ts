@@ -12,6 +12,7 @@ export type UpdateProfilePayload = {
 };
 
 export type UserData = {
+	userId: string;
 	displayName: string;
 	bio: string;
 	photoURL?: string;

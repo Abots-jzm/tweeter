@@ -23,6 +23,7 @@ async function updateProfile(payload: UpdateProfilePayload) {
 	}
 
 	const user: UserData = {
+		userId: payload.uid,
 		displayName: payload.displayName,
 		bio: payload.bio,
 		imageIndex: payload.imageIndex,

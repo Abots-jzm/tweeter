@@ -13,7 +13,8 @@ async function getHomeTweets(userId: string, following: string[]) {
 			or(
 				where("followers", "array-contains", userId),
 				where("uid", "==", userId),
-				where("retweets", "array-contains-any", following)
+				where("retweets", "array-contains-any", following),
+				where("likes", "array-contains-any", following)
 			)
 		);
 		return (await getDocs(homeTweetsQuery)).docs.map((doc) => doc.data());

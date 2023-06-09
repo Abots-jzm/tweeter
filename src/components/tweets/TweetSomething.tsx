@@ -124,13 +124,13 @@ function TweetSomething({ replyModalOpen, setReplyModalOpen }: Props) {
 							{isPublicReply && (
 								<>
 									<MdPublic />
-									<span className="text-xs font-medium">Everyone can reply</span>
+									<span className="text-xs font-medium">Everyone</span>
 								</>
 							)}
 							{!isPublicReply && (
 								<>
 									<MdPeople />
-									<span className="text-xs font-medium">People you follow</span>
+									<span className="text-xs font-medium">Following</span>
 								</>
 							)}
 							{replyModalOpen && (

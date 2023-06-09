@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useNavigate, useParams, useSearchParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import Tweet from "../components/tweets/Tweet";
 import BlankPNG from "../assets/blank-profile-picture.png";
 import { MdPersonAdd } from "react-icons/md";
@@ -8,19 +8,15 @@ import { useAppSelector } from "../store/hooks";
 import useGetUserProfile from "../hooks/profile/useGetUserProfile";
 import SideNavigationTabs from "../components/nav/SideNavigationTabs";
 
-type Tab = "tweet" | "replies" | "media" | "likes";
-
 function Profile() {
 	const [isFollowing, setIsFollowing] = useState(false);
 
-	const [searchParams, setSearchParams] = useSearchParams({ filter: "tweet" });
 	const { id } = useParams();
 
 	const { data: userProfile } = useGetUserProfile(id!);
 	const userId = useAppSelector((state) => state.auth.uid);
 	const isMyProfile = id === userId;
 
-	const activeTab = searchParams.get("filter") as Tab;
 	const navigate = useNavigate();
 
 	return (

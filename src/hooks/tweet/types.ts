@@ -48,6 +48,12 @@ export type LikePayload = {
 	action: "like" | "unlike";
 };
 
+export type FollowPayload = {
+	personToFollowId: string;
+	userId: string;
+	action: "follow" | "unfollow";
+};
+
 export type BookmarkPayload = {
 	tweetId: string;
 	userId: string;
