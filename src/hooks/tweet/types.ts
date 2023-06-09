@@ -23,6 +23,7 @@ export type Tweet = {
 	likes: string[];
 	retweets: RetweetType[];
 	bookmarks: string[];
+	impressionsIndex: number;
 	replies: Reply[];
 	isPublicReply: boolean;
 };

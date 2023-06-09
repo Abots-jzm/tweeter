@@ -27,6 +27,7 @@ async function tweet(payload: TweetPayload) {
 		likes: [],
 		retweets: [],
 		bookmarks: [],
+		impressionsIndex: 0,
 		replies: [],
 		isPublicReply: payload.isPublicReply,
 	};
