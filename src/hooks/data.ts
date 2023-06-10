@@ -6,4 +6,8 @@ export const QueryKeys = {
 	latestTweets: "latest-tweets",
 	mediaTweets: "media-tweets",
 	people: "people",
+	userTweets: "user-tweets",
+	userMedia: "user-media",
+	userReplies: "user-replies",
+	userLikes: "user-likes",
 };

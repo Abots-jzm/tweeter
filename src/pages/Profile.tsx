@@ -1,23 +1,62 @@
-import React, { useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import Tweet from "../components/tweets/Tweet";
 import BlankPNG from "../assets/blank-profile-picture.png";
 import { MdPersonAdd } from "react-icons/md";
 import { Paths } from "../routes";
-import { useAppSelector } from "../store/hooks";
+import { useAppDispatch, useAppSelector } from "../store/hooks";
 import useGetUserProfile from "../hooks/profile/useGetUserProfile";
 import SideNavigationTabs from "../components/nav/SideNavigationTabs";
+import useGetAllUserTweets from "../hooks/tweet/useGetAllUserTweets";
+import { authActions } from "../store/slices/authSlice";
+import useFollow from "../hooks/tweet/useFollow";
+import useGetAllUserMedia from "../hooks/tweet/useGetAllUserMedia";
+import useGetAllUserLikes from "../hooks/tweet/useGetAllUserLikes";
+
+type Tab = "tweet" | "media" | "likes";
 
 function Profile() {
-	const [isFollowing, setIsFollowing] = useState(false);
-
 	const { id } = useParams();
+	const [searchParams] = useSearchParams({ filter: "tweet" });
+	const activeTab = searchParams.get("filter") as Tab;
 
-	const { data: userProfile } = useGetUserProfile(id!);
 	const userId = useAppSelector((state) => state.auth.uid);
+	const dispatch = useAppDispatch();
 	const isMyProfile = id === userId;
-
 	const navigate = useNavigate();
+
+	const { mutate: follow } = useFollow();
+	const { data: userProfile, isLoading: profileLoading } = useGetUserProfile(id!);
+	const { data: allTweets, isLoading: allTweetsLoading } = useGetAllUserTweets(activeTab === "tweet", id);
+	const { data: allMedia, isLoading: allMediaLoading } = useGetAllUserMedia(activeTab === "media", id);
+	const { data: allLikes, isLoading: allLikesLoading } = useGetAllUserLikes(activeTab === "likes", id);
+
+	const [isFollowing, setIsFollowing] = useState(userId ? userProfile?.followers.includes(userId) : false);
+	const [noOfFollowers, setNoOfFollowers] = useState(userProfile?.followers.length || 0);
+
+	useEffect(() => {
+		if (!userProfile) return;
+		setNoOfFollowers(userProfile.followers.length);
+		setIsFollowing(userId ? userProfile?.followers.includes(userId) : false);
+	}, [userProfile]);
+
+	function onFollowBtnClicked() {
+		if (!userId) {
+			dispatch(authActions.logout());
+			return;
+		}
+
+		follow({ action: isFollowing ? "unfollow" : "follow", personToFollowId: id!, userId });
+		setIsFollowing((prev) => !prev);
+		setNoOfFollowers((prev) => (isFollowing ? prev - 1 : prev + 1));
+	}
+
+	if (profileLoading)
+		return (
+			<div className="mt-32 grid place-items-center">
+				<div className="spinner h-40 w-40 border-l-primaryBlue" />
+			</div>
+		);
 
 	return (
 		<div className="relative pt-[149px] lg:pt-[242px]">
@@ -42,10 +81,11 @@ function Profile() {
 							<div className="text-2xl font-semibold text-darkGrey">{userProfile?.displayName}</div>
 							<div className="flex gap-[26px]">
 								<div>
-									<span className="font-semibold text-darkGrey">2,569</span> Following
+									<span className="font-semibold text-darkGrey">{userProfile?.following.length}</span> Following
 								</div>
 								<div>
-									<span className="font-semibold text-darkGrey">10.8k</span> Followers
+									<span className="font-semibold text-darkGrey">{noOfFollowers}</span> Follower
+									{noOfFollowers === 1 ? "" : "s"}
 								</div>
 							</div>
 						</div>
@@ -61,10 +101,10 @@ function Profile() {
 					)}
 					{!isMyProfile && (
 						<button
-							className={`mb-5 ml-0 mt-0 self-center whitespace-nowrap rounded px-6 py-2 text-white lg:mb-0 lg:ml-auto lg:mt-5 lg:self-start ${
+							className={`mb-5 ml-0 mt-0 flex gap-2 self-center whitespace-nowrap rounded px-6 py-2 text-white lg:mb-0 lg:ml-auto lg:mt-5 lg:self-start ${
 								isFollowing ? "bg-ash" : "bg-primaryBlue"
 							}`}
-							onClick={() => setIsFollowing((prev) => !prev)}
+							onClick={onFollowBtnClicked}
 						>
 							<MdPersonAdd />
 							<span className="text-xs font-medium">{isFollowing ? "Unfollow" : "Follow"}</span>
@@ -73,17 +113,96 @@ function Profile() {
 				</div>
 			</div>
 			<div className="mx-auto flex max-w-[1100px] flex-col gap-6 px-5 py-6 lg:flex-row">
-				<SideNavigationTabs initialTab="tweet" layoutId="profileNav" tabs={["tweet", "replies", "media", "likes"]} />
+				<SideNavigationTabs initialTab="tweet" layoutId="profileNav" tabs={["tweet", "media", "likes"]} />
 				<div className="flex-1">
 					<div className="mb-6 flex flex-col gap-6">
-						{/* <Tweet
-							image="https://images.immediate.co.uk/production/volatile/sites/30/2022/07/Black-beans-avocado-on-toast-d351aa6.jpg?quality=90&webp=true&fit=700,350"
-							replies
-						>
-							Lorem ipsum dolor sit amet consectetur adipisicing elit. Eum omnis odit cupiditate molestiae ad hic
-							consequatur eius quo dolor minus. In deserunt sunt architecto doloremque eius, fugiat recusandae ipsam
-							eos.
-						</Tweet> */}
+						{activeTab === "tweet" && (
+							<>
+								{allTweetsLoading && (
+									<div className="grid w-full place-items-center pt-24">
+										<div className="spinner h-20 w-20 border-l-primaryBlue" />
+									</div>
+								)}
+								{!allTweetsLoading && allTweets?.length === 0 && !allTweetsLoading && (
+									<div className="mx-auto pt-20">You haven't tweeted anything yet</div>
+								)}
+								{!allTweetsLoading &&
+									allTweets?.map((tweet) => (
+										<Tweet
+											key={tweet.id}
+											id={tweet.id}
+											image={tweet.imageUrl}
+											displayName={tweet.displayName}
+											time={tweet.time}
+											photo={tweet.photoUrl}
+											likes={tweet.likes}
+											retweets={tweet.retweets}
+											replies={tweet.replies}
+											userTweetId={tweet.uid}
+										>
+											{tweet.content}
+										</Tweet>
+									))}
+							</>
+						)}
+						{activeTab === "media" && (
+							<>
+								{allMediaLoading && (
+									<div className="grid w-full place-items-center pt-24">
+										<div className="spinner h-20 w-20 border-l-primaryBlue" />
+									</div>
+								)}
+								{!allMediaLoading && allMedia?.length === 0 && !allMediaLoading && (
+									<div className="mx-auto pt-20">You haven't tweeted any media yet</div>
+								)}
+								{!allMediaLoading &&
+									allMedia?.map((tweet) => (
+										<Tweet
+											key={tweet.id}
+											id={tweet.id}
+											image={tweet.imageUrl}
+											displayName={tweet.displayName}
+											time={tweet.time}
+											photo={tweet.photoUrl}
+											likes={tweet.likes}
+											retweets={tweet.retweets}
+											replies={tweet.replies}
+											userTweetId={tweet.uid}
+										>
+											{tweet.content}
+										</Tweet>
+									))}
+							</>
+						)}
+						{activeTab === "likes" && (
+							<>
+								{allLikesLoading && (
+									<div className="grid w-full place-items-center pt-24">
+										<div className="spinner h-20 w-20 border-l-primaryBlue" />
+									</div>
+								)}
+								{!allLikesLoading && allLikes?.length === 0 && !allLikesLoading && (
+									<div className="mx-auto pt-20">You haven't liked any tweet yet</div>
+								)}
+								{!allLikesLoading &&
+									allLikes?.map((tweet) => (
+										<Tweet
+											key={tweet.id}
+											id={tweet.id}
+											image={tweet.imageUrl}
+											displayName={tweet.displayName}
+											time={tweet.time}
+											photo={tweet.photoUrl}
+											likes={tweet.likes}
+											retweets={tweet.retweets}
+											replies={tweet.replies}
+											userTweetId={tweet.uid}
+										>
+											{tweet.content}
+										</Tweet>
+									))}
+							</>
+						)}
 					</div>
 				</div>
 			</div>
