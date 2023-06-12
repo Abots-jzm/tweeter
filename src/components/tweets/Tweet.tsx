@@ -24,6 +24,7 @@ type Props = {
 	displayName: string;
 	time: Timestamp;
 	likes: string[];
+	bookmarks: string[];
 	retweets: RetweetType[];
 	replies: ReplyType[];
 	userTweetId: string;
@@ -38,6 +39,7 @@ function Tweet({
 	displayName,
 	time,
 	likes,
+	bookmarks,
 	retweets,
 	userTweetId,
 	id,
@@ -56,7 +58,7 @@ function Tweet({
 	const [noOfRetweets, setNoOfRetweets] = useState(retweets.length);
 	const [isLiked, setIsLiked] = useState(userId ? likes.includes(userId) : false);
 	const [noOfLikes, setNoOfLikes] = useState(likes.length);
-	const [isSaved, setIsSaved] = useState(false);
+	const [isSaved, setIsSaved] = useState(userId ? bookmarks.includes(userId) : false);
 
 	const { data: userProfile } = useGetUserProfile(userId);
 	const { mutate: like } = useLike();
@@ -234,7 +236,7 @@ function Tweet({
 				{showReplyBox && (
 					<form className="gap4 flex border-t border-t-offWhite p-2.5" onSubmit={onReplySubmit}>
 						<div className="h-10 w-10 overflow-hidden rounded-lg">
-							<img className="image-center" src={BlankPNG} alt="picture" />
+							<img className="image-center" src={userProfile?.photoURL || BlankPNG} alt="picture" />
 						</div>
 						<input
 							className="placeholder:[#bdbdbd] w-full rounded-lg border border-offWhite bg-[#fafafa] px-3 py-2.5 pr-[50px] text-sm font-medium text-[#4f4f4f] outline-none"

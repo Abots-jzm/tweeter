@@ -10,4 +10,5 @@ export const QueryKeys = {
 	userMedia: "user-media",
 	userReplies: "user-replies",
 	userLikes: "user-likes",
+	bookmarks: "bookmarks",
 };

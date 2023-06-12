@@ -31,7 +31,6 @@ async function getHomeTweets(userId: string, following: string[]) {
 
 function useGetHomeTweets(userId: string | null, following?: string[]) {
 	return useQuery([QueryKeys.homeTweets], () => getHomeTweets(userId!, following!), {
-		refetchOnWindowFocus: false,
 		enabled: !!following,
 		select: (data) => {
 			const sortedData = data

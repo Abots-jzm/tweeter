@@ -136,6 +136,7 @@ function Profile() {
 											time={tweet.time}
 											photo={tweet.photoUrl}
 											likes={tweet.likes}
+											bookmarks={tweet.bookmarks}
 											retweets={tweet.retweets}
 											replies={tweet.replies}
 											userTweetId={tweet.uid}
@@ -165,6 +166,7 @@ function Profile() {
 											time={tweet.time}
 											photo={tweet.photoUrl}
 											likes={tweet.likes}
+											bookmarks={tweet.bookmarks}
 											retweets={tweet.retweets}
 											replies={tweet.replies}
 											userTweetId={tweet.uid}
@@ -194,6 +196,7 @@ function Profile() {
 											time={tweet.time}
 											photo={tweet.photoUrl}
 											likes={tweet.likes}
+											bookmarks={tweet.bookmarks}
 											retweets={tweet.retweets}
 											replies={tweet.replies}
 											userTweetId={tweet.uid}

@@ -13,7 +13,6 @@ async function getAllUserMedia(userId: string) {
 
 function useGetAllUserMedia(enabled: boolean, userId?: string) {
 	return useQuery([QueryKeys.userMedia, userId], () => getAllUserMedia(userId!), {
-		refetchOnWindowFocus: false,
 		enabled,
 		select: (data) => data.filter((tweet) => !!tweet.imageUrl),
 	});

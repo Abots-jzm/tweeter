@@ -45,6 +45,7 @@ function Explore() {
 										time={tweet.time}
 										photo={tweet.photoUrl}
 										likes={tweet.likes}
+										bookmarks={tweet.bookmarks}
 										retweets={tweet.retweets}
 										replies={tweet.replies}
 										userTweetId={tweet.uid}
@@ -70,6 +71,7 @@ function Explore() {
 										time={tweet.time}
 										photo={tweet.photoUrl}
 										likes={tweet.likes}
+										bookmarks={tweet.bookmarks}
 										retweets={tweet.retweets}
 										replies={tweet.replies}
 										userTweetId={tweet.uid}
@@ -95,6 +97,7 @@ function Explore() {
 										time={tweet.time}
 										photo={tweet.photoUrl}
 										likes={tweet.likes}
+										bookmarks={tweet.bookmarks}
 										retweets={tweet.retweets}
 										replies={tweet.replies}
 										userTweetId={tweet.uid}

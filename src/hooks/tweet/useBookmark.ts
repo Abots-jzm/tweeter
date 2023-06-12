@@ -1,7 +1,8 @@
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { db } from "../../api/firebase";
 import { arrayRemove, arrayUnion, doc, increment, updateDoc } from "firebase/firestore";
 import { BookmarkPayload } from "./types";
+import { QueryKeys } from "../data";
 
 async function bookmark({ tweetId, userId, action }: BookmarkPayload) {
 	const tweetRef = doc(db, "tweets", tweetId);
@@ -12,7 +13,8 @@ async function bookmark({ tweetId, userId, action }: BookmarkPayload) {
 }
 
 function useBookmark() {
-	return useMutation(bookmark);
+	const queryClient = useQueryClient();
+	return useMutation(bookmark, { onSuccess: () => queryClient.invalidateQueries([QueryKeys.bookmarks]) });
 }
 
 export default useBookmark;
