@@ -38,21 +38,6 @@ function Home() {
 		<div className="mx-auto my-0 flex max-w-[1100px] gap-6 px-5 py-6">
 			<div className="flex-1">
 				<TweetSomething replyModalOpen={replyModalOpen} setReplyModalOpen={setReplyModalOpen} />
-				{peopleData && peopleData.length > 0 && (
-					<div className="mt-6 block w-full self-start rounded-xl bg-white px-2.5 py-5 shadow-soft lg:hidden">
-						{peopleData?.map((person) => (
-							<Person
-								key={person.userId}
-								id={person.userId}
-								name={person.displayName}
-								photo={person.photoURL}
-								cover={person.coverURL}
-								followers={person.followers}
-								bio={person.bio}
-							/>
-						))}
-					</div>
-				)}
 				<div className="my-6 flex flex-col gap-6">
 					{homeTweets?.map((tweet) => (
 						<Tweet
@@ -73,6 +58,21 @@ function Home() {
 						</Tweet>
 					))}
 				</div>
+				{peopleData && peopleData.length > 0 && (
+					<div className="mt-6 block w-full self-start rounded-xl bg-white px-2.5 py-5 shadow-soft lg:hidden">
+						{peopleData?.map((person) => (
+							<Person
+								key={person.userId}
+								id={person.userId}
+								name={person.displayName}
+								photo={person.photoURL}
+								cover={person.coverURL}
+								followers={person.followers}
+								bio={person.bio}
+							/>
+						))}
+					</div>
+				)}
 			</div>
 			{peopleData && peopleData.length > 0 && (
 				<div className="hidden basis-[306px] self-start rounded-xl bg-white px-5 py-3.5 shadow-soft lg:block">
