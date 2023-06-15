@@ -119,7 +119,7 @@ function TweetSomething({ replyModalOpen, setReplyModalOpen }: Props) {
 						<label className="flex cursor-pointer items-center" htmlFor="image">
 							<MdOutlineImage />
 						</label>
-						<input className="hidden" type="file" id="image" {...register("image")} />
+						<input className="hidden" type="file" id="image" {...register("image")} accept="image/*" />
 						<div className="relative flex cursor-pointer items-center gap-2" onClick={toggleReplyModal}>
 							{isPublicReply && (
 								<>
