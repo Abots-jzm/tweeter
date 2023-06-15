@@ -1,10 +1,11 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { db, storage } from "../../api/firebase";
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
-import { arrayRemove, arrayUnion, doc, writeBatch } from "firebase/firestore";
+import { arrayRemove, arrayUnion, collection, doc, getDocs, query, where, writeBatch } from "firebase/firestore";
 import { UpdateProfilePayload, UserData } from "./types";
 import { QueryKeys } from "../data";
 import { useAppSelector } from "../../store/hooks";
+import { TweetUpdate } from "../tweet/types";
 
 async function updateProfile(payload: UpdateProfilePayload) {
 	let photoUrl;
@@ -39,6 +40,17 @@ async function updateProfile(payload: UpdateProfilePayload) {
 	payload.previousDisplayName &&
 		batch.update(doc(db, "default/info"), { allNames: arrayRemove(payload.previousDisplayName) });
 	batch.set(doc(db, "users/" + payload.uid), user, { merge: true });
+
+	const tweetsUpdateData: TweetUpdate = { displayName: payload.displayName };
+	if (photoUrl) tweetsUpdateData.photoUrl = photoUrl;
+
+	const tweetsCollectionRef = collection(db, "tweets");
+	const allUserTweetsQuery = query(tweetsCollectionRef, where("uid", "==", payload.uid));
+	const allUserTweets = (await getDocs(allUserTweetsQuery)).docs;
+	allUserTweets.forEach((tweetDoc) => {
+		const docRef = doc(db, "tweets", tweetDoc.id);
+		batch.update(docRef, tweetsUpdateData);
+	});
 
 	return await batch.commit();
 }

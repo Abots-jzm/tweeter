@@ -28,6 +28,11 @@ export type Tweet = {
 	isPublicReply: boolean;
 };
 
+export type TweetUpdate = {
+	displayName: string;
+	photoUrl?: string;
+};
+
 export type RetweetType = {
 	name: string;
 	uid: string;
