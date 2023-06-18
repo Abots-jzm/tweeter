@@ -37,9 +37,9 @@ function Layout({ children }: Props) {
 	return (
 		<Div100vh className="flex flex-col" onClick={() => setLogoutModalOpen(false)}>
 			<header className="flex items-center justify-between px-[5vw] py-4 md:py-0">
-				<div>
+				<Link to={Paths.home}>
 					<img src={LogoSVG} alt="logo" />
-				</div>
+				</Link>
 				<NavigationTabs
 					responsiveness="desktop"
 					tabs={[

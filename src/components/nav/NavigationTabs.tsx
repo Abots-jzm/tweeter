@@ -28,7 +28,7 @@ function NavigationTabs({ responsiveness, tabs }: Props) {
 					{tab.path.startsWith(location.pathname) ? (
 						<motion.div
 							className="block h-[3px] w-20 self-stretch rounded-horizontalBar bg-primaryBlue"
-							layoutId={`${responsiveness === "mobile" ? "m" : ""}active`}
+							layoutId={responsiveness}
 						/>
 					) : (
 						<div className="h-[3px] w-20 self-stretch bg-transparent" />

@@ -59,6 +59,7 @@ function Tweet({
 	const [isLiked, setIsLiked] = useState(userId ? likes.includes(userId) : false);
 	const [noOfLikes, setNoOfLikes] = useState(likes.length);
 	const [isSaved, setIsSaved] = useState(userId ? bookmarks.includes(userId) : false);
+	const [noOfComments, setNoOfComments] = useState(replies.length);
 
 	const { data: userProfile } = useGetUserProfile(userId);
 	const { mutate: like } = useLike();
@@ -83,6 +84,7 @@ function Tweet({
 		setDisplayedReplies((prev) => [newReply, ...prev]);
 		setShowComments(true);
 		setEnteredReply("");
+		setNoOfComments((prev) => prev + 1);
 	}
 
 	function onLikeBtnClicked() {
@@ -183,9 +185,9 @@ function Tweet({
 								{noOfLikes} like{noOfLikes > 1 && "s"}
 							</div>
 						)}
-						{replies.length > 0 && (
+						{noOfComments > 0 && (
 							<div>
-								{replies.length} comment{replies.length > 1 && "s"}
+								{noOfComments} comment{noOfComments > 1 && "s"}
 							</div>
 						)}
 						{noOfRetweets > 0 && (
