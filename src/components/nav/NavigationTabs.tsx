@@ -1,6 +1,7 @@
 import React from "react";
 import { motion } from "framer-motion";
 import { NavLink } from "react-router-dom";
+import classNames from "classnames";
 
 type Props = {
 	responsiveness: "desktop" | "mobile";
@@ -10,16 +11,19 @@ type Props = {
 function NavigationTabs({ responsiveness, tabs }: Props) {
 	return (
 		<nav
-			className={`justify-evenly gap-8 self-stretch font-poppins font-medium text-ash lg:gap-16 ${
-				responsiveness === "mobile" ? "flex text-2xl md:hidden" : "hidden text-sm md:flex"
-			}`}
+			className={classNames("justify-evenly gap-8 self-start font-poppins font-medium text-ash lg:gap-16", {
+				"flex text-2xl md:hidden": responsiveness === "mobile",
+				"hidden text-sm md:flex": responsiveness !== "mobile",
+			})}
 		>
 			{tabs.map((tab, i) => (
 				<NavLink
 					className={({ isActive }) =>
-						`relative flex h-[68px] flex-col items-center justify-end gap-[18px] no-underline ${
-							isActive ? "font-semibold text-primaryBlue" : "text-inherit"
-						}`
+						classNames(
+							"relative flex h-[68px] flex-col items-center justify-end gap-[18px] no-underline",
+							{ "font-semibold text-primaryBlue": isActive },
+							{ "text-inherit": !isActive }
+						)
 					}
 					to={tab.path}
 					key={i}
