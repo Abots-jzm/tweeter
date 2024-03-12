@@ -43,6 +43,8 @@ function TweetSomething({ replyModalOpen, setReplyModalOpen }: Props) {
 
 		if (!userProfile) return;
 
+		content = content.replace(/(\n{3,})/g, "\n\n");
+
 		tweet(
 			{
 				uid,

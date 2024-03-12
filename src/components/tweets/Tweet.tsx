@@ -246,6 +246,7 @@ function Tweet({
 							placeholder="Tweet your reply"
 							value={enteredReply}
 							onChange={(e) => setEnteredReply(e.target.value)}
+							required
 						/>
 					</form>
 				)}
